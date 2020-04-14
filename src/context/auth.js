@@ -22,8 +22,15 @@ const AuthContext = React.createContext()
 
 const AuthProvider = props => {
    const [requestItsFinished, setRequestItsFinished] = useState(false)
-   const { data = { user: null }, error, isSettled, isPending, isRejected, reload } = useAsync({
-      promiseFn: getUserByToken,
+   const {
+      data = { user: null },
+      error,
+      isSettled,
+      isPending,
+      isRejected,
+      reload
+   } = useAsync({
+      promiseFn: getUserByToken
    })
 
    useLayoutEffect(() => {
@@ -74,7 +81,12 @@ const AuthProvider = props => {
       return
    }
 
-   return <AuthContext.Provider value={{ login, logout, signup, data }} {...props} />
+   return (
+      <AuthContext.Provider
+         value={{ login, logout, signup, data }}
+         {...props}
+      />
+   )
 }
 
 const useAuth = () => {

@@ -2,7 +2,7 @@ const INITIAL_STATE = {
    data: [],
    filter: null,
    loading: false,
-   error: false,
+   error: false
 }
 
 export default function patients(state = INITIAL_STATE, action) {
@@ -16,7 +16,12 @@ export default function patients(state = INITIAL_STATE, action) {
       case 'REQUEST_PATIENT':
          return { filter: action.payload.filter, ...state, loading: true }
       case 'SUCCESS_PATIENT':
-         return { data: action.payload.data, loading: false, error: false, filter: null }
+         return {
+            data: action.payload.data,
+            loading: false,
+            error: false,
+            filter: null
+         }
       case 'FAILURE_PATIENT':
          return { ...state, loading: false, error: true, filter: null }
       default:

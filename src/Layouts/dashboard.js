@@ -16,7 +16,7 @@ import {
    Box,
    Divider,
    IconButton,
-   Avatar,
+   Avatar
 } from '@material-ui/core'
 
 import { MoveToInbox, Mail, Menu, ExitToApp } from '@material-ui/icons'
@@ -29,30 +29,30 @@ const drawerWidth = 240
 
 const stylesLayout = makeStyles(theme => ({
    root: {
-      display: 'flex',
+      display: 'flex'
    },
    appBar: {
-      zIndex: theme.zIndex.drawer + 100,
+      zIndex: theme.zIndex.drawer + 100
    },
    title: {
-      marginLeft: theme.spacing(1),
+      marginLeft: theme.spacing(1)
    },
    grow: {
-      flexGrow: 1,
+      flexGrow: 1
    },
    hide: {
-      display: 'none',
+      display: 'none'
    },
    drawer: {
       width: drawerWidth,
-      flexShrink: 0,
+      flexShrink: 0
    },
    drawerPaper: {
-      width: drawerWidth,
+      width: drawerWidth
    },
    content: {
       flexGrow: 1,
-      padding: theme.spacing(3),
+      padding: theme.spacing(3)
    },
    toolbar: theme.mixins.toolbar,
    content: {
@@ -60,28 +60,28 @@ const stylesLayout = makeStyles(theme => ({
       padding: theme.spacing(3),
       transition: theme.transitions.create('margin', {
          easing: theme.transitions.easing.sharp,
-         duration: theme.transitions.duration.leavingScreen,
+         duration: theme.transitions.duration.leavingScreen
       }),
-      marginLeft: -drawerWidth,
+      marginLeft: -drawerWidth
    },
    contentShift: {
       transition: theme.transitions.create('margin', {
          easing: theme.transitions.easing.easeOut,
-         duration: theme.transitions.duration.enteringScreen,
+         duration: theme.transitions.duration.enteringScreen
       }),
-      marginLeft: 0,
+      marginLeft: 0
    },
    purple: {
       color: theme.palette.getContrastText(deepPurple[500]),
-      backgroundColor: deepPurple[500],
+      backgroundColor: deepPurple[500]
    },
    avatar: {
-      marginBottom: theme.spacing(1),
+      marginBottom: theme.spacing(1)
    },
    links: {
       paddingTop: 10,
-      paddingBottom: 10,
-   },
+      paddingBottom: 10
+   }
 }))
 function ListItemLink(props) {
    return <ListItem button component='a' {...props} />
@@ -104,14 +104,24 @@ const Layout = props => {
       <div className={classes.root}>
          <AppBar position='fixed' className={classes.appBar}>
             <Toolbar>
-               <IconButton color='inherit' aria-label='abrir menu' edge='start' onClick={handleDrawerOpen}>
+               <IconButton
+                  color='inherit'
+                  aria-label='abrir menu'
+                  edge='start'
+                  onClick={handleDrawerOpen}
+               >
                   <Menu />
                </IconButton>
                <Typography variant='h6' className={classes.title}>
                   NAS
                </Typography>
                <div className={classes.grow} />
-               <IconButton color='inherit' aria-label='sair' edge='start' onClick={logout}>
+               <IconButton
+                  color='inherit'
+                  aria-label='sair'
+                  edge='start'
+                  onClick={logout}
+               >
                   <ExitToApp />
                </IconButton>
             </Toolbar>
@@ -122,7 +132,7 @@ const Layout = props => {
             anchor='left'
             open={open}
             classes={{
-               paper: classes.drawerPaper,
+               paper: classes.drawerPaper
             }}
          >
             <div className={classes.toolbar} />
@@ -140,7 +150,11 @@ const Layout = props => {
                   </ListItemIcon>
                   <ListItemText primary={'Leitos'} />
                </ListItem>
-               <ListItemLink className={classes.links} component={Link} to='/patients'>
+               <ListItemLink
+                  className={classes.links}
+                  component={Link}
+                  to='/patients'
+               >
                   <ListItemIcon>
                      <Mail />
                   </ListItemIcon>
@@ -152,7 +166,7 @@ const Layout = props => {
          <main
             // maxWidth='lg'
             className={clsx(classes.content, {
-               [classes.contentShift]: open,
+               [classes.contentShift]: open
             })}
          >
             <Container maxWidth='lg'>

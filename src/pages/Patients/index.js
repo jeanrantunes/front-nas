@@ -11,23 +11,28 @@ import {
    IconButton,
    Badge,
    Avatar,
-   Divider,
+   Divider
 } from '@material-ui/core'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import { Delete } from '@material-ui/icons'
 
-import { requestPatients, addPatient, updatePatient, removePatient } from '../../store/actions/patients'
+import {
+   requestPatients,
+   addPatient,
+   updatePatient,
+   removePatient
+} from '../../store/actions/patients'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
 
 const useStyles = makeStyles(theme => ({
    root: {
       width: '100%',
-      padding: 0,
+      padding: 0
    },
    listItem: {
-      padding: theme.spacing(2),
-   },
+      padding: theme.spacing(2)
+   }
 }))
 
 const StyledBadge = withStyles(theme => ({
@@ -44,19 +49,19 @@ const StyledBadge = withStyles(theme => ({
          borderRadius: '50%',
          animation: '$ripple 1.2s infinite ease-in-out',
          border: '1px solid currentColor',
-         content: '""',
-      },
+         content: '""'
+      }
    },
    '@keyframes ripple': {
       '0%': {
          transform: 'scale(.8)',
-         opacity: 1,
+         opacity: 1
       },
       '100%': {
          transform: 'scale(1.4)',
-         opacity: 0,
-      },
-   },
+         opacity: 0
+      }
+   }
 }))(Badge)
 
 const Patients = () => {
@@ -99,7 +104,7 @@ const Patients = () => {
                                     overlap='circle'
                                     anchorOrigin={{
                                        vertical: 'bottom',
-                                       horizontal: 'right',
+                                       horizontal: 'right'
                                     }}
                                     variant='dot'
                                  >
@@ -114,13 +119,23 @@ const Patients = () => {
                               primary={patient.name}
                               secondary={
                                  patient.outcomeDate
-                                    ? `Desfecho: ${patient.outcome} - ${new Date(patient.outcomeDate).toUTCString()}`
+                                    ? `Desfecho: ${
+                                         patient.outcome
+                                      } - ${new Date(
+                                         patient.outcomeDate
+                                      ).toUTCString()}`
                                     : patient.hospitalizationDate &&
-                                      `Entrada: ${new Date(patient.hospitalizationDate).toUTCString()}`
+                                      `Entrada: ${new Date(
+                                         patient.hospitalizationDate
+                                      ).toUTCString()}`
                               }
                            />
                            <ListItemSecondaryAction>
-                              <IconButton edge='end' aria-label='delete' onClick={() => deletePatient(patient.id)}>
+                              <IconButton
+                                 edge='end'
+                                 aria-label='delete'
+                                 onClick={() => deletePatient(patient.id)}
+                              >
                                  <Delete />
                               </IconButton>
                            </ListItemSecondaryAction>
@@ -131,7 +146,11 @@ const Patients = () => {
             </List>
          </Paper>
          {deleteDialog && (
-            <DeleteDialog deleteDialog={deleteDialog} setDeleteDialog={setDeleteDialog} patientId={patientId} />
+            <DeleteDialog
+               deleteDialog={deleteDialog}
+               setDeleteDialog={setDeleteDialog}
+               patientId={patientId}
+            />
          )}
       </Layout>
    )
