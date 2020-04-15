@@ -339,8 +339,10 @@ const Beds = props => {
                                     variant='outlined'
                                     size='small'
                                     color='primary'
-                                    onClick={handleClickOucome}
+                                    // onClick={handleClickOucome}
                                     startIcon={<Assignment />}
+                                    to={`/nas/${patient.id}`}
+                                    component={Link}
                                  >
                                     Registrar NAS
                                  </Button>

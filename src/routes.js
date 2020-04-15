@@ -6,6 +6,7 @@ import Signup from './pages/Signup'
 import Beds from './pages/Beds'
 import Patients from './pages/Patients'
 import Patient from './pages/Patient'
+import Nas from './pages/Nas'
 
 import { useUser } from './context/user'
 
@@ -33,6 +34,7 @@ const Routes = () => (
          <PrivateRoute exact path='/' component={Beds} />
          <PrivateRoute path='/patients' component={Patients} />
          <PrivateRoute path='/patient/:id' component={Patient} />
+         <PrivateRoute path='/nas/:id' component={Nas} />
          <PrivateRoute exact path='/patient' component={Patient} />
          <Route path='/login' component={Login} />
          <Route path='/signup' component={Signup} />
