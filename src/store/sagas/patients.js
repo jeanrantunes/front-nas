@@ -5,7 +5,7 @@ import api from '../../services/api'
 export function* getPatientList({ payload: { filter } }) {
    try {
       const {
-         data: { data: data },
+         data: { data: data }
       } = yield call(api.get, 'v1/patients', { params: filter })
       yield put({ type: 'SUCCESS_PATIENT', payload: { data } })
    } catch (err) {
@@ -18,7 +18,10 @@ export function* addPatient({ payload: { data: content } }) {
       const currentData = yield select(state => state.patients.data)
       const { data } = yield call(api.post, 'v1/patients', content)
 
-      yield put({ type: 'SUCCESS_PATIENT', payload: { data: [...currentData, data] } })
+      yield put({
+         type: 'SUCCESS_PATIENT',
+         payload: { data: [...currentData, data] }
+      })
    } catch (err) {
       console.log(err)
       yield put({ type: 'FAILURE_PATIENT' })

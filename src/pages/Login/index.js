@@ -11,7 +11,7 @@ import {
    Checkbox,
    Link,
    Paper,
-   Typography,
+   Typography
 } from '@material-ui/core'
 import { LockOutlined as LockOutlinedIcon } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
@@ -21,32 +21,32 @@ import { emailValidation, passwordValidation } from '../../utils/validations'
 
 const useStyles = makeStyles(theme => ({
    root: {
-      height: '100vh',
+      height: '100vh'
    },
    image: {
       backgroundImage: 'url(https://source.unsplash.com/1600x900/?nurse )',
       backgroundRepeat: 'no-repeat',
       backgroundColor: theme.palette.grey[50],
       backgroundSize: 'cover',
-      backgroundPosition: 'center',
+      backgroundPosition: 'center'
    },
    paper: {
       margin: theme.spacing(8, 4),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
+      alignItems: 'center'
    },
    avatar: {
       margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
+      backgroundColor: theme.palette.secondary.main
    },
    form: {
       width: '100%', // Fix IE 11 issue.
-      marginTop: theme.spacing(1),
+      marginTop: theme.spacing(1)
    },
    submit: {
-      margin: theme.spacing(3, 0, 2),
-   },
+      margin: theme.spacing(3, 0, 2)
+   }
 }))
 
 const LoginSchema = Yup.object().shape({
@@ -56,7 +56,7 @@ const LoginSchema = Yup.object().shape({
    password: Yup.string()
       .min(4, passwordValidation.tooShort)
       .max(20, passwordValidation.tooLong)
-      .required(passwordValidation.required),
+      .required(passwordValidation.required)
 })
 
 const Login = () => {
@@ -67,7 +67,15 @@ const Login = () => {
       <Grid container component='main' className={classes.root}>
          <CssBaseline />
          <Grid item xs={false} sm={4} md={8} className={classes.image} />
-         <Grid item xs={12} sm={8} md={4} component={Paper} elevation={6} square>
+         <Grid
+            item
+            xs={12}
+            sm={8}
+            md={4}
+            component={Paper}
+            elevation={6}
+            square
+         >
             <div className={classes.paper}>
                <Avatar className={classes.avatar}>
                   <LockOutlinedIcon />
@@ -95,7 +103,7 @@ const Login = () => {
                         handleChange,
                         handleBlur,
                         handleSubmit,
-                        handleReset,
+                        handleReset
                      } = props
                      return (
                         <form
@@ -119,7 +127,11 @@ const Login = () => {
                               onChange={handleChange}
                               onBlur={handleBlur}
                               value={values.email}
-                              helperText={errors.email && touched.email ? errors.email : ' '}
+                              helperText={
+                                 errors.email && touched.email
+                                    ? errors.email
+                                    : ' '
+                              }
                            />
                            <TextField
                               variant='outlined'
@@ -134,10 +146,16 @@ const Login = () => {
                               onChange={handleChange}
                               onBlur={handleBlur}
                               value={values.password}
-                              helperText={errors.password && touched.password ? errors.password : ' '}
+                              helperText={
+                                 errors.password && touched.password
+                                    ? errors.password
+                                    : ' '
+                              }
                            />
                            <FormControlLabel
-                              control={<Checkbox value='remember' color='primary' />}
+                              control={
+                                 <Checkbox value='remember' color='primary' />
+                              }
                               label='Salvar usuário'
                            />
                            <Button

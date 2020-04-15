@@ -2,12 +2,11 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { CircularProgress, Backdrop } from '@material-ui/core'
 
-// import { Container } from './styles';
 const useStyles = makeStyles(theme => ({
    backdrop: {
       zIndex: theme.zIndex.drawer + 1,
-      color: '#fff',
-   },
+      color: '#fff'
+   }
 }))
 
 const Loader = () => {

@@ -8,7 +8,7 @@ import {
    TextField as TextFieldMeterial,
    FormControl,
    Snackbar,
-   CircularProgress,
+   CircularProgress
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import { green, white, red } from '@material-ui/core/colors'
@@ -30,32 +30,32 @@ const useStyles = makeStyles(theme => ({
       marginTop: theme.spacing(8),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
+      alignItems: 'center'
    },
    form: {
       width: '100%', // Fix IE 11 issue.
-      marginTop: theme.spacing(3),
+      marginTop: theme.spacing(3)
    },
    formControl: {
-      marginBottom: theme.spacing(3),
+      marginBottom: theme.spacing(3)
    },
    submit: {
-      margin: theme.spacing(3, 0, 2),
+      margin: theme.spacing(3, 0, 2)
    },
    chips: {
       display: 'flex',
-      flexWrap: 'wrap',
+      flexWrap: 'wrap'
    },
    chip: {
-      margin: 2,
+      margin: 2
    },
    noLabel: {
-      marginTop: theme.spacing(3),
+      marginTop: theme.spacing(3)
    },
    wrapper: {
       marginTop: theme.spacing(3),
       float: 'right',
-      position: 'relative',
+      position: 'relative'
    },
    buttonProgress: {
       color: green[500],
@@ -63,22 +63,22 @@ const useStyles = makeStyles(theme => ({
       top: '50%',
       left: '50%',
       marginTop: -12,
-      marginLeft: -12,
+      marginLeft: -12
    },
    success: {
       backgroundColor: green[500],
-      color: theme.white,
+      color: theme.white
    },
    error: {
       backgroundColor: red[500],
-      color: theme.white,
+      color: theme.white
    },
    buttonSuccess: {
       backgroundColor: green[500],
       '&:hover': {
-         backgroundColor: green[700],
-      },
-   },
+         backgroundColor: green[700]
+      }
+   }
 }))
 
 const PatientSchema = Yup.object().shape({
@@ -86,9 +86,7 @@ const PatientSchema = Yup.object().shape({
       .min(4, nameValidation.tooShort)
       .max(40, nameValidation.tooLong)
       .required(nameValidation.required),
-   saps3: Yup.number()
-      .min(0, saps3.tooShort)
-      .max(9999, saps3.tooLong),
+   saps3: Yup.number().min(0, saps3.tooShort).max(9999, saps3.tooLong)
 })
 
 const Patient = props => {
@@ -103,7 +101,7 @@ const Patient = props => {
    const timeSnack = 2000
 
    const buttonClassname = clsx({
-      [classes.buttonSuccess]: success,
+      [classes.buttonSuccess]: success
    })
    useEffect(() => {
       if (!id) {
@@ -128,15 +126,17 @@ const Patient = props => {
                initialValues={{
                   name: patient.name || '',
                   birthday: patient.birthday || new Date('1970'),
-                  hospitalizationDate: patient.hospitalizationDate || new Date(),
-                  hospitalizationTime: patient.hospitalizationDate || new Date(),
+                  hospitalizationDate:
+                     patient.hospitalizationDate || new Date(),
+                  hospitalizationTime:
+                     patient.hospitalizationDate || new Date(),
                   hospitalizationReason: patient.hospitalizationReason || [],
                   comorbidities: patient.comorbidities || [],
                   saps3: patient.saps3 || 0,
                   outcome: patient.outcome === 'pending' ? '' : patient.outcome,
                   outcomeTime: patient.outcomeDate || new Date(),
                   outcomeDate: patient.outcomeDate || new Date(),
-                  bed: patient.bed || 'A',
+                  bed: patient.bed || 'A'
                }}
                validationSchema={PatientSchema}
                onSubmit={async (values, { setSubmitting }) => {
@@ -154,8 +154,14 @@ const Patient = props => {
                      const data = {
                         ...rest,
                         outcome: outcome || 'pending',
-                        hospitalizationDate: combineDateAndTime(hospitalizationDate, hospitalizationTime),
-                        outcomeDate: combineDateAndTime(outcomeDate, outcomeTime),
+                        hospitalizationDate: combineDateAndTime(
+                           hospitalizationDate,
+                           hospitalizationTime
+                        ),
+                        outcomeDate: combineDateAndTime(
+                           outcomeDate,
+                           outcomeTime
+                        )
                      }
                      if (!id) {
                         await api.post('v1/patients', data)
@@ -182,7 +188,14 @@ const Patient = props => {
                }}
             >
                {props => {
-                  const { values, touched, errors, handleChange, handleBlur, handleSubmit } = props
+                  const {
+                     values,
+                     touched,
+                     errors,
+                     handleChange,
+                     handleBlur,
+                     handleSubmit
+                  } = props
                   return (
                      <form
                         className={classes.form}
@@ -244,7 +257,7 @@ const Patient = props => {
                                        { id: 'C', name: 'C' },
                                        { id: 'D', name: 'D' },
                                        { id: 'E', name: 'E' },
-                                       { id: 'F', name: 'F' },
+                                       { id: 'F', name: 'F' }
                                     ]}
                                     label='Leito'
                                     name='bed'
@@ -262,7 +275,11 @@ const Patient = props => {
                                        value={values.saps3}
                                        onChange={handleChange}
                                        onBlur={handleBlur}
-                                       helperText={errors.saps3 && touched.saps3 ? errors.saps3 : ' '}
+                                       helperText={
+                                          errors.saps3 && touched.saps3
+                                             ? errors.saps3
+                                             : ' '
+                                       }
                                        variant='outlined'
                                     />
                                  </FormControl>
@@ -292,7 +309,7 @@ const Patient = props => {
                                     options={[
                                        { id: '', name: 'Nenhum' },
                                        { id: 'discharge', name: 'Alta' },
-                                       { id: 'death', name: 'Morte' },
+                                       { id: 'death', name: 'Morte' }
                                     ]}
                                     label='Desfecho'
                                     name='outcome'
@@ -334,7 +351,12 @@ const Patient = props => {
                            >
                               Salvar
                            </Button>
-                           {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                           {loading && (
+                              <CircularProgress
+                                 size={24}
+                                 className={classes.buttonProgress}
+                              />
+                           )}
                         </div>
                         <Snackbar open={success}>
                            <Alert variant='filled' severity='success'>

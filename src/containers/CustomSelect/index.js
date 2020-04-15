@@ -6,7 +6,16 @@ import { Select, TextField } from 'formik-material-ui'
 import api from '../../services/api'
 
 const CustomSelect = props => {
-   const { id, endpoint, options, name, label, variant, classes, multiple } = props
+   const {
+      id,
+      endpoint,
+      options,
+      name,
+      label,
+      variant,
+      classes,
+      multiple
+   } = props
    const [data, setData] = useState(null)
 
    useEffect(() => {

@@ -1,31 +1,44 @@
 import React from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import { Avatar, Button, CssBaseline, Grid, TextField, Link, Container, Typography } from '@material-ui/core'
+import {
+   Avatar,
+   Button,
+   CssBaseline,
+   Grid,
+   TextField,
+   Link,
+   Container,
+   Typography
+} from '@material-ui/core'
 import { LockOutlined as LockOutlinedIcon } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
 
 import { useAuth } from '../../context/auth'
-import { nameValidation, emailValidation, passwordValidation } from '../../utils/validations'
+import {
+   nameValidation,
+   emailValidation,
+   passwordValidation
+} from '../../utils/validations'
 
 const useStyles = makeStyles(theme => ({
    paper: {
       marginTop: theme.spacing(8),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
+      alignItems: 'center'
    },
    avatar: {
       margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
+      backgroundColor: theme.palette.secondary.main
    },
    form: {
       width: '100%', // Fix IE 11 issue.
-      marginTop: theme.spacing(3),
+      marginTop: theme.spacing(3)
    },
    submit: {
-      margin: theme.spacing(3, 0, 2),
-   },
+      margin: theme.spacing(3, 0, 2)
+   }
 }))
 
 const SignupSchema = Yup.object().shape({
@@ -44,7 +57,10 @@ const SignupSchema = Yup.object().shape({
       .min(4, passwordValidation.tooShort)
       .max(20, passwordValidation.tooLong)
       .required(passwordValidation.required),
-   passwordConfirmation: Yup.string().oneOf([Yup.ref('password'), null], 'Senhas não combinam'),
+   passwordConfirmation: Yup.string().oneOf(
+      [Yup.ref('password'), null],
+      'Senhas não combinam'
+   )
 })
 
 const Signup = () => {
@@ -62,11 +78,26 @@ const Signup = () => {
                Cadastrar
             </Typography>
             <Formik
-               initialValues={{ name: '', lastname: '', email: '', password: '', passwordConfirmation: '' }}
+               initialValues={{
+                  name: '',
+                  lastname: '',
+                  email: '',
+                  password: '',
+                  passwordConfirmation: ''
+               }}
                validationSchema={SignupSchema}
                onSubmit={async (values, { setSubmitting }) => {
-                  const { name, lastname, passwordConfirmation, ...rest } = values
-                  const response = await signup({ name: `${name} ${lastname}`, role: 'USER', ...rest })
+                  const {
+                     name,
+                     lastname,
+                     passwordConfirmation,
+                     ...rest
+                  } = values
+                  const response = await signup({
+                     name: `${name} ${lastname}`,
+                     role: 'USER',
+                     ...rest
+                  })
                   const { email, password } = rest
                   await login({ email, password })
                }}
@@ -82,7 +113,7 @@ const Signup = () => {
                      handleChange,
                      handleBlur,
                      handleSubmit,
-                     handleReset,
+                     handleReset
                   } = props
                   return (
                      <form
@@ -107,7 +138,11 @@ const Signup = () => {
                                  onChange={handleChange}
                                  onBlur={handleBlur}
                                  value={values.name}
-                                 helperText={errors.name && touched.name ? errors.name : ' '}
+                                 helperText={
+                                    errors.name && touched.name
+                                       ? errors.name
+                                       : ' '
+                                 }
                               />
                            </Grid>
                            <Grid item xs={12} sm={6}>
@@ -122,7 +157,11 @@ const Signup = () => {
                                  onChange={handleChange}
                                  onBlur={handleBlur}
                                  value={values.lastname}
-                                 helperText={errors.lastname && touched.lastname ? errors.lastname : ' '}
+                                 helperText={
+                                    errors.lastname && touched.lastname
+                                       ? errors.lastname
+                                       : ' '
+                                 }
                               />
                            </Grid>
                            <Grid item xs={12}>
@@ -137,7 +176,11 @@ const Signup = () => {
                                  onChange={handleChange}
                                  onBlur={handleBlur}
                                  value={values.email}
-                                 helperText={errors.email && touched.email ? errors.email : ' '}
+                                 helperText={
+                                    errors.email && touched.email
+                                       ? errors.email
+                                       : ' '
+                                 }
                               />
                            </Grid>
                            <Grid item xs={12}>
@@ -153,7 +196,11 @@ const Signup = () => {
                                  onChange={handleChange}
                                  onBlur={handleBlur}
                                  value={values.password}
-                                 helperText={errors.password && touched.password ? errors.password : ' '}
+                                 helperText={
+                                    errors.password && touched.password
+                                       ? errors.password
+                                       : ' '
+                                 }
                               />
                            </Grid>
                            <Grid item xs={12}>
@@ -170,14 +217,21 @@ const Signup = () => {
                                  onBlur={handleBlur}
                                  value={values.passwordConfirmation}
                                  helperText={
-                                    errors.passwordConfirmation && touched.passwordConfirmation
+                                    errors.passwordConfirmation &&
+                                    touched.passwordConfirmation
                                        ? errors.passwordConfirmation
                                        : ' '
                                  }
                               />
                            </Grid>
                         </Grid>
-                        <Button type='submit' fullWidth variant='contained' color='primary' className={classes.submit}>
+                        <Button
+                           type='submit'
+                           fullWidth
+                           variant='contained'
+                           color='primary'
+                           className={classes.submit}
+                        >
                            Cadastrar-se
                         </Button>
                         <Grid container justify='flex-end'>
