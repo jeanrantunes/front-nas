@@ -38,6 +38,7 @@ import {
 import { age } from '../../helpers/date'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
+import AnimatedBadge from '../../components/AnimatedBadge'
 
 const TransitionDialog = React.forwardRef(function Transition(props, ref) {
    return <Slide direction='up' ref={ref} {...props} />
@@ -184,6 +185,17 @@ const WarningDialog = props => {
    )
 }
 
+const DoesShowDot = ({ flag, children }) => {
+   if (!flag) {
+      return (
+         <AnimatedBadge vertical='top' horizontal='left' color='warning'>
+            {children}
+         </AnimatedBadge>
+      )
+   }
+   return children
+}
+
 const Beds = props => {
    const { data: patients } = useSelector(store => store.patients)
    const classes = useStyles()
@@ -265,15 +277,13 @@ const Beds = props => {
                                     </Avatar>
                                  }
                                  action={
-                                    <React.Fragment>
-                                       <IconButton
-                                          aria-controls='simple-menu'
-                                          aria-haspopup='true'
-                                          onClick={e => handleClick(e, patient)}
-                                       >
-                                          <MoreVert />
-                                       </IconButton>
-                                    </React.Fragment>
+                                    <IconButton
+                                       aria-controls='simple-menu'
+                                       aria-haspopup='true'
+                                       onClick={e => handleClick(e, patient)}
+                                    >
+                                       <MoreVert />
+                                    </IconButton>
                                  }
                                  title={patient.name}
                                  subheader={
@@ -335,17 +345,20 @@ const Beds = props => {
                                  )}
                               </CardContent>
                               <CardActions className={classes.buttonsCard}>
-                                 <Button
-                                    variant='outlined'
-                                    size='small'
-                                    color='primary'
-                                    // onClick={handleClickOucome}
-                                    startIcon={<Assignment />}
-                                    to={`/nas/${patient.id}`}
-                                    component={Link}
-                                 >
-                                    Registrar NAS
-                                 </Button>
+                                 <DoesShowDot flag={patient.dailyNas}>
+                                    <Button
+                                       variant='outlined'
+                                       size='small'
+                                       color='primary'
+                                       // onClick={handleClickOucome}
+                                       startIcon={<Assignment />}
+                                       to={`/nas/${patient.id}`}
+                                       component={Link}
+                                    >
+                                       Registrar NAS
+                                    </Button>
+                                 </DoesShowDot>
+
                                  <Button
                                     variant='outlined'
                                     size='small'

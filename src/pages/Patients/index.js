@@ -9,21 +9,16 @@ import {
    ListItemText,
    ListItemSecondaryAction,
    IconButton,
-   Badge,
    Avatar,
    Divider
 } from '@material-ui/core'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import { Delete } from '@material-ui/icons'
 
-import {
-   requestPatients,
-   addPatient,
-   updatePatient,
-   removePatient
-} from '../../store/actions/patients'
+import { requestPatients } from '../../store/actions/patients'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
+import AnimatedBadge from '../../components/AnimatedBadge'
 
 const useStyles = makeStyles(theme => ({
    root: {
@@ -34,35 +29,6 @@ const useStyles = makeStyles(theme => ({
       padding: theme.spacing(2)
    }
 }))
-
-const StyledBadge = withStyles(theme => ({
-   badge: {
-      backgroundColor: '#44b700',
-      color: '#44b700',
-      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-      '&::after': {
-         position: 'absolute',
-         top: -1,
-         left: -1,
-         width: '100%',
-         height: '100%',
-         borderRadius: '50%',
-         animation: '$ripple 1.2s infinite ease-in-out',
-         border: '1px solid currentColor',
-         content: '""'
-      }
-   },
-   '@keyframes ripple': {
-      '0%': {
-         transform: 'scale(.8)',
-         opacity: 1
-      },
-      '100%': {
-         transform: 'scale(1.4)',
-         opacity: 0
-      }
-   }
-}))(Badge)
 
 const Patients = () => {
    const patients = useSelector(store => store.patients)
@@ -100,18 +66,18 @@ const Patients = () => {
                         >
                            <ListItemIcon>
                               {patient.outcome === 'pending' ? (
-                                 <StyledBadge
+                                 <AnimatedBadge
+                                    vertical='bottom'
+                                    horizontal='right'
+                                    color='success'
                                     overlap='circle'
-                                    anchorOrigin={{
-                                       vertical: 'bottom',
-                                       horizontal: 'right'
-                                    }}
-                                    variant='dot'
                                  >
                                     <Avatar>{patient.bed}</Avatar>
-                                 </StyledBadge>
+                                 </AnimatedBadge>
                               ) : (
-                                 <Avatar>{patient.name[0]}</Avatar>
+                                 //    <Avatar>{patient.bed}</Avatar>
+                                 // </StyledBadge>
+                                 <Avatar>{patient.bed}</Avatar>
                               )}
                            </ListItemIcon>
                            <ListItemText

@@ -931,51 +931,26 @@ const Nas = props => {
             //    validationSchema={PatientSchema}
             onSubmit={async (values, { setSubmitting }) => {
                console.log(values)
-               //   setLoading(true)
-               //   setSuccess(false)
-               //   try {
-               //      const {
-               //         hospitalizationDate,
-               //         hospitalizationTime,
-               //         outcomeTime,
-               //         outcomeDate,
-               //         outcome,
-               //         ...rest
-               //      } = values
-               //      const data = {
-               //         ...rest,
-               //         outcome: outcome || 'pending',
-               //         hospitalizationDate: combineDateAndTime(
-               //            hospitalizationDate,
-               //            hospitalizationTime
-               //         ),
-               //         outcomeDate: combineDateAndTime(
-               //            outcomeDate,
-               //            outcomeTime
-               //         )
-               //      }
-               //      if (!id) {
-               //         await api.post('v1/patients', data)
-               //      } else {
-               //         await api.put(`v1/patients/${id}`, data)
-               //      }
+               setLoading(true)
+               setSuccess(false)
+               try {
+                  await api.post('v1/nas', { ...values, patientId: id })
+                  setLoading(false)
+                  setSuccess(true)
+                  setError(false)
 
-               //      setLoading(false)
-               //      setSuccess(true)
-               //      setError(false)
-
-               //      setTimeout(() => {
-               //         props.history.goBack()
-               //         setSuccess(false)
-               //      }, timeSnack)
-               //   } catch (err) {
-               //      setLoading(false)
-               //      setSuccess(false)
-               //      setError(false)
-               //      setTimeout(() => {
-               //         setError(false)
-               //      }, timeSnack)
-               //   }
+                  setTimeout(() => {
+                     props.history.goBack()
+                     setSuccess(false)
+                  }, timeSnack)
+               } catch (err) {
+                  setLoading(false)
+                  setSuccess(false)
+                  setError(false)
+                  setTimeout(() => {
+                     setError(false)
+                  }, timeSnack)
+               }
             }}
          >
             {props => {
