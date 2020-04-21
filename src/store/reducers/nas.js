@@ -6,17 +6,17 @@ const INITIAL_STATE = {
    error: false
 }
 
-export default function patients(state = INITIAL_STATE, action) {
+export default function nas(state = INITIAL_STATE, action) {
    switch (action.type) {
-      case 'ADD_PATIENT':
+      case 'ADD_NAS':
          return { ...state, loading: true }
-      case 'REMOVE_PATIENT':
+      case 'REMOVE_NAS':
          return { ...state, loading: true }
-      case 'UPDATE_PATIENT':
+      case 'UPDATE_NAS':
          return { ...state, loading: true }
-      case 'REQUEST_PATIENT':
+      case 'REQUEST_NAS':
          return { filter: action.payload.filter, ...state, loading: true }
-      case 'SUCCESS_PATIENT':
+      case 'SUCCESS_NAS':
          return {
             data: action.payload.data,
             metadata: action.payload.metadata,
@@ -24,7 +24,7 @@ export default function patients(state = INITIAL_STATE, action) {
             error: false,
             filter: null
          }
-      case 'FAILURE_PATIENT':
+      case 'FAILURE_NAS':
          return { ...state, loading: false, error: true, filter: null }
       default:
          return state

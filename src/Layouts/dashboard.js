@@ -160,9 +160,18 @@ const Layout = props => {
                   </ListItemIcon>
                   <ListItemText primary={'Pacientes'} />
                </ListItemLink>
+               <ListItemLink
+                  className={classes.links}
+                  component={Link}
+                  to='/nas'
+               >
+                  <ListItemIcon>
+                     <Mail />
+                  </ListItemIcon>
+                  <ListItemText primary={'NAS'} />
+               </ListItemLink>
             </List>
          </Drawer>
-         <Toolbar />
          <main
             // maxWidth='lg'
             className={clsx(classes.content, {

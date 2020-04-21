@@ -10,7 +10,7 @@ import {
    Slide
 } from '@material-ui/core'
 
-import { removePatient } from '../../store/actions/patients'
+// import { removePatient } from '../../store/actions/patients'
 
 const TransitionDialog = React.forwardRef(function Transition(props, ref) {
    return <Slide direction='up' ref={ref} {...props} />
@@ -18,10 +18,10 @@ const TransitionDialog = React.forwardRef(function Transition(props, ref) {
 
 const DialogDeletePatient = props => {
    const dispatch = useDispatch()
-   const { deleteDialog, setDeleteDialog, patientId: id } = props
+   const { title, text, deleteDialog, setDeleteDialog, id, funcRemove } = props
 
    function deleteConfirm() {
-      dispatch(removePatient({ id }))
+      dispatch(funcRemove({ id }))
       setDeleteDialog(false)
    }
 
@@ -34,12 +34,10 @@ const DialogDeletePatient = props => {
          aria-labelledby='alert-dialog-slide-title'
          aria-describedby='alert-dialog-slide-description'
       >
-         <DialogTitle id='alert-dialog-slide-title'>
-            {'Tem certeza que deseja excluir o paciente?'}
-         </DialogTitle>
+         <DialogTitle id='alert-dialog-slide-title'>{title}</DialogTitle>
          <DialogContent>
             <DialogContentText id='alert-dialog-slide-description'>
-               Não será possível desfazer está ação...
+               {text}
             </DialogContentText>
          </DialogContent>
          <DialogActions>

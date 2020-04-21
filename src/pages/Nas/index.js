@@ -17,23 +17,17 @@ import {
    StepContent,
    Typography,
    Paper,
-   Switch,
-   FormLabel
+   Switch
 } from '@material-ui/core'
+import { UnfoldMoreOutlined, UnfoldLess } from '@material-ui/icons'
 import { Alert } from '@material-ui/lab'
-import { green, white, red } from '@material-ui/core/colors'
-import { MuiPickersUtilsProvider } from '@material-ui/pickers'
-import { TextField } from 'formik-material-ui'
-import { TimePicker, DatePicker } from 'formik-material-ui-pickers'
-import DateFnsUtils from '@date-io/date-fns'
+import { green, red } from '@material-ui/core/colors'
+
 import { makeStyles } from '@material-ui/core/styles'
 
 import Layout from '../../Layouts/dashboard'
 import Loader from '../../components/Loader'
 import api from '../../services/api'
-import { nameValidation, saps3 } from '../../utils/validations'
-import { combineDateAndTime } from '../../helpers/date'
-import CustomSelect from '../../containers/CustomSelect'
 
 const useStyles = makeStyles(theme => ({
    paper: {
@@ -97,8 +91,12 @@ const useStyles = makeStyles(theme => ({
    },
    actionsSteper: {
       marginTop: theme.spacing(3)
+   },
+   buttonSubmit: {
+      marginLeft: theme.spacing(6)
    }
 }))
+
 function getStepContent(step, classes, values, handleChange) {
    switch (step) {
       case 0:
@@ -835,6 +833,7 @@ function getStepContent(step, classes, values, handleChange) {
          )
    }
 }
+
 function getSteps() {
    return [
       'Monitorização e Controles',
@@ -862,13 +861,6 @@ function getSteps() {
       'Intervenções específicas fora da unidade'
    ]
 }
-const PatientSchema = Yup.object().shape({
-   name: Yup.string()
-      .min(4, nameValidation.tooShort)
-      .max(40, nameValidation.tooLong)
-      .required(nameValidation.required),
-   saps3: Yup.number().min(0, saps3.tooShort).max(9999, saps3.tooLong)
-})
 
 const Nas = props => {
    const classes = useStyles()
@@ -876,6 +868,7 @@ const Nas = props => {
    const { id } = props.match.params
 
    const [patient, setPatient] = useState(null)
+   const [openAll, setOpenAll] = useState(false)
    const [loading, setLoading] = useState(false)
    const [success, setSuccess] = useState(false)
    const [error, setError] = useState(false)
@@ -902,6 +895,14 @@ const Nas = props => {
 
    return (
       <Layout>
+         <Button
+            variant='contained'
+            color='primary'
+            startIcon={openAll ? <UnfoldLess /> : <UnfoldMoreOutlined />}
+            onClick={() => setOpenAll(!openAll)}
+         >
+            {openAll ? 'Retrair' : 'Expandir'}
+         </Button>
          <Formik
             initialValues={{
                monitoringAndControls: '1a',
@@ -928,7 +929,6 @@ const Nas = props => {
                specificInterventionsInTheUnit: false,
                specificInterventionsOutsideTheUnit: false
             }}
-            //    validationSchema={PatientSchema}
             onSubmit={async (values, { setSubmitting }) => {
                console.log(values)
                setLoading(true)
@@ -973,7 +973,7 @@ const Nas = props => {
                   >
                      <Stepper activeStep={activeStep} orientation='vertical'>
                         {steps.map((label, index) => (
-                           <Step key={label}>
+                           <Step key={label} expanded={openAll}>
                               <StepLabel>{label}</StepLabel>
                               <StepContent>
                                  {getStepContent(
@@ -984,50 +984,65 @@ const Nas = props => {
                                  )}
 
                                  <div className={classes.actionsSteper}>
-                                    <Button
-                                       disabled={activeStep === 0}
-                                       onClick={handleBack}
-                                       className={classes.button}
-                                       size='small'
-                                    >
-                                       Voltar
-                                    </Button>
-                                    {activeStep === steps.length - 1 ? (
+                                    {!openAll && (
                                        <React.Fragment>
                                           <Button
-                                             variant='contained'
-                                             color='primary'
-                                             size='small'
-                                             type='submit'
+                                             disabled={activeStep === 0}
+                                             onClick={handleBack}
                                              className={classes.button}
+                                             size='small'
                                           >
-                                             Salvar
+                                             Voltar
                                           </Button>
-                                          {loading && (
-                                             <CircularProgress
-                                                size={24}
-                                                className={
-                                                   classes.buttonProgress
-                                                }
-                                             />
+                                          {activeStep === steps.length - 1 ? (
+                                             <React.Fragment>
+                                                <Button
+                                                   variant='contained'
+                                                   color='primary'
+                                                   size='small'
+                                                   type='submit'
+                                                   className={classes.button}
+                                                >
+                                                   Salvar
+                                                </Button>
+                                                {loading && (
+                                                   <CircularProgress
+                                                      size={24}
+                                                      className={
+                                                         classes.buttonProgress
+                                                      }
+                                                   />
+                                                )}
+                                             </React.Fragment>
+                                          ) : (
+                                             <Button
+                                                variant='contained'
+                                                color='primary'
+                                                size='small'
+                                                onClick={handleNext}
+                                                className={classes.button}
+                                             >
+                                                Próximo
+                                             </Button>
                                           )}
                                        </React.Fragment>
-                                    ) : (
-                                       <Button
-                                          variant='contained'
-                                          color='primary'
-                                          size='small'
-                                          onClick={handleNext}
-                                          className={classes.button}
-                                       >
-                                          Próximo
-                                       </Button>
                                     )}
                                  </div>
                               </StepContent>
                            </Step>
                         ))}
                      </Stepper>
+                     {openAll && (
+                        <Button
+                           variant='contained'
+                           color='primary'
+                           size='small'
+                           type='submit'
+                           className={classes.buttonSubmit}
+                        >
+                           Salvar
+                        </Button>
+                     )}
                      <Snackbar open={success}>
                         <Alert variant='filled' severity='success'>
                            Salvo com sucesso :D
