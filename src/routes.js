@@ -8,7 +8,6 @@ import Patients from './pages/Patients'
 import Patient from './pages/Patient'
 import Nas from './pages/Nas'
 import NasList from './pages/NasList'
-
 import { useUser } from './context/user'
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
@@ -35,7 +34,7 @@ const Routes = () => (
          <PrivateRoute exact path='/' component={Beds} />
          <PrivateRoute path='/patients' component={Patients} />
          <PrivateRoute path='/patient/:id' component={Patient} />
-         <PrivateRoute exact path='/nas' component={NasList} />
+         <PrivateRoute path='/nas' component={NasList} />
          <PrivateRoute path='/nas/:id' component={Nas} />
          <PrivateRoute exact path='/patient' component={Patient} />
          <Route path='/login' component={Login} />

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { Link } from 'react-router-dom'
@@ -83,9 +83,11 @@ const stylesLayout = makeStyles(theme => ({
       paddingBottom: 10
    }
 }))
+
 function ListItemLink(props) {
    return <ListItem button component='a' {...props} />
 }
+
 const Layout = props => {
    const classes = stylesLayout()
    const [open, setOpen] = React.useState(true)
@@ -164,6 +166,10 @@ const Layout = props => {
                   className={classes.links}
                   component={Link}
                   to='/nas'
+                  to={{
+                     pathname: '/nas',
+                     state: { resetFilter: true }
+                  }}
                >
                   <ListItemIcon>
                      <Mail />

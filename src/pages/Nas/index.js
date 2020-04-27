@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+
 import clsx from 'clsx'
 import { Formik, Field } from 'formik'
-import * as Yup from 'yup'
 import {
    Grid,
    Button,
@@ -19,6 +20,7 @@ import {
    Paper,
    Switch
 } from '@material-ui/core'
+
 import { UnfoldMoreOutlined, UnfoldLess } from '@material-ui/icons'
 import { Alert } from '@material-ui/lab'
 import { green, red } from '@material-ui/core/colors'
@@ -28,6 +30,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Layout from '../../Layouts/dashboard'
 import Loader from '../../components/Loader'
 import api from '../../services/api'
+import { isEmpty } from 'lodash-es'
 
 const useStyles = makeStyles(theme => ({
    paper: {
@@ -94,6 +97,9 @@ const useStyles = makeStyles(theme => ({
    },
    buttonSubmit: {
       marginLeft: theme.spacing(6)
+   },
+   expandButton: {
+      float: 'right'
    }
 }))
 
@@ -866,8 +872,9 @@ const Nas = props => {
    const classes = useStyles()
 
    const { id } = props.match.params
+   const nasList = useSelector(state => state.nas.data)
 
-   const [patient, setPatient] = useState(null)
+   const [nas, setNas] = useState(null)
    const [openAll, setOpenAll] = useState(false)
    const [loading, setLoading] = useState(false)
    const [success, setSuccess] = useState(false)
@@ -877,6 +884,30 @@ const Nas = props => {
    const buttonClassname = clsx({
       [classes.buttonSuccess]: success
    })
+
+   useEffect(() => {
+      const getNas = async id => {
+         try {
+            const { data } = await api.get(`/v1/nas/${id}`)
+            setNas(data)
+            setOpenAll(true)
+         } catch {
+            setNas({})
+         }
+      }
+      const idNas = parseInt(id)
+      /* in this case its a create nas */
+      if (isNaN(idNas) || id.length > 23) {
+         setNas({})
+         return
+      }
+      if (nasList) {
+         setNas(nasList.find(n => n.id === idNas))
+      }
+      if (!nas) {
+         getNas(idNas)
+      }
+   }, [id, nasList])
 
    const [activeStep, setActiveStep] = React.useState(0)
    const steps = getSteps()
@@ -900,163 +931,184 @@ const Nas = props => {
             color='primary'
             startIcon={openAll ? <UnfoldLess /> : <UnfoldMoreOutlined />}
             onClick={() => setOpenAll(!openAll)}
+            className={classes.expandButton}
          >
             {openAll ? 'Retrair' : 'Expandir'}
          </Button>
-         <Formik
-            initialValues={{
-               monitoringAndControls: '1a',
-               laboratoryInvestigations: false,
-               medicationExceptVasoactiveDrugs: true,
-               hygieneProcedures: '4a',
-               caringForDrains: true,
-               mobilizationAndPositioning: '6b',
-               supportAndCare: '7a',
-               administrativeAndManagerialTasks: '8b',
-               ventilatorySupport: false,
-               lungFunction: true,
-               artificialAirways: true,
-               vasoactiveDrugs: false,
-               intravenousReplacement: true,
-               monitoringOfTheLeftAtrium: true,
-               cardiorespiratoryResumption: false,
-               hemofiltrationTechniques: false,
-               urineOutput: false,
-               intracranialPressure: false,
-               acidosisTreatment: false,
-               intravenousHyperalimentation: false,
-               enteralFeeding: true,
-               specificInterventionsInTheUnit: false,
-               specificInterventionsOutsideTheUnit: false
-            }}
-            onSubmit={async (values, { setSubmitting }) => {
-               console.log(values)
-               setLoading(true)
-               setSuccess(false)
-               try {
-                  await api.post('v1/nas', { ...values, patientId: id })
-                  setLoading(false)
-                  setSuccess(true)
-                  setError(false)
-
-                  setTimeout(() => {
-                     props.history.goBack()
-                     setSuccess(false)
-                  }, timeSnack)
-               } catch (err) {
-                  setLoading(false)
+         {nas && (
+            <Formik
+               initialValues={{
+                  monitoringAndControls: nas.monitoringAndControls || '1a',
+                  laboratoryInvestigations:
+                     nas.laboratoryInvestigations || false,
+                  medicationExceptVasoactiveDrugs:
+                     nas.medicationExceptVasoactiveDrugs || true,
+                  hygieneProcedures: nas.hygieneProcedures || '4a',
+                  caringForDrains: nas.caringForDrains || true,
+                  mobilizationAndPositioning:
+                     nas.mobilizationAndPositioning || '6b',
+                  supportAndCare: nas.supportAndCare || '7a',
+                  administrativeAndManagerialTasks:
+                     nas.administrativeAndManagerialTasks || '8b',
+                  ventilatorySupport: nas.ventilatorySupport || false,
+                  lungFunction: nas.lungFunction || true,
+                  artificialAirways: nas.artificialAirways || true,
+                  vasoactiveDrugs: nas.vasoactiveDrugs || false,
+                  intravenousReplacement: nas.intravenousReplacement || true,
+                  monitoringOfTheLeftAtrium:
+                     nas.monitoringOfTheLeftAtrium || true,
+                  cardiorespiratoryResumption:
+                     nas.cardiorespiratoryResumption || false,
+                  hemofiltrationTechniques:
+                     nas.hemofiltrationTechniques || false,
+                  urineOutput: nas.urineOutput || false,
+                  intracranialPressure: nas.intracranialPressure || false,
+                  acidosisTreatment: nas.acidosisTreatment || false,
+                  intravenousHyperalimentation:
+                     nas.intravenousHyperalimentation || false,
+                  enteralFeeding: nas.enteralFeeding || true,
+                  specificInterventionsInTheUnit:
+                     nas.specificInterventionsInTheUnit || false,
+                  specificInterventionsOutsideTheUnit:
+                     nas.specificInterventionsOutsideTheUnit || false
+               }}
+               onSubmit={async (values, { setSubmitting }) => {
+                  setLoading(true)
                   setSuccess(false)
-                  setError(false)
-                  setTimeout(() => {
-                     setError(false)
-                  }, timeSnack)
-               }
-            }}
-         >
-            {props => {
-               const {
-                  values,
-                  touched,
-                  errors,
-                  handleChange,
-                  handleBlur,
-                  handleSubmit
-               } = props
-               return (
-                  <form
-                     className={classes.form}
-                     onSubmit={e => {
-                        e.preventDefault()
-                        handleSubmit()
-                     }}
-                     noValidate
-                  >
-                     <Stepper activeStep={activeStep} orientation='vertical'>
-                        {steps.map((label, index) => (
-                           <Step key={label} expanded={openAll}>
-                              <StepLabel>{label}</StepLabel>
-                              <StepContent>
-                                 {getStepContent(
-                                    index,
-                                    classes,
-                                    values,
-                                    handleChange
-                                 )}
+                  try {
+                     if (isEmpty(nas)) {
+                        await api.post('v1/nas', { ...values, patientId: id })
+                     } else {
+                        await api.put(`v1/nas/${id}`, {
+                           ...values,
+                           patientId: nas.patientId
+                        })
+                     }
 
-                                 <div className={classes.actionsSteper}>
-                                    {!openAll && (
-                                       <React.Fragment>
-                                          <Button
-                                             disabled={activeStep === 0}
-                                             onClick={handleBack}
-                                             className={classes.button}
-                                             size='small'
-                                          >
-                                             Voltar
-                                          </Button>
-                                          {activeStep === steps.length - 1 ? (
-                                             <React.Fragment>
+                     setLoading(false)
+                     setSuccess(true)
+                     setError(false)
+
+                     setTimeout(() => {
+                        props.history.goBack()
+                        setSuccess(false)
+                     }, timeSnack)
+                  } catch (err) {
+                     setLoading(false)
+                     setSuccess(false)
+                     setError(false)
+                     setTimeout(() => {
+                        setError(false)
+                     }, timeSnack)
+                  }
+               }}
+            >
+               {props => {
+                  const {
+                     values,
+                     touched,
+                     errors,
+                     handleChange,
+                     handleBlur,
+                     handleSubmit
+                  } = props
+                  return (
+                     <form
+                        className={classes.form}
+                        onSubmit={e => {
+                           e.preventDefault()
+                           handleSubmit()
+                        }}
+                        noValidate
+                     >
+                        <Stepper activeStep={activeStep} orientation='vertical'>
+                           {steps.map((label, index) => (
+                              <Step key={label} expanded={openAll}>
+                                 <StepLabel>{label}</StepLabel>
+                                 <StepContent>
+                                    {getStepContent(
+                                       index,
+                                       classes,
+                                       values,
+                                       handleChange
+                                    )}
+
+                                    <div className={classes.actionsSteper}>
+                                       {!openAll && (
+                                          <React.Fragment>
+                                             <Button
+                                                disabled={activeStep === 0}
+                                                onClick={handleBack}
+                                                className={classes.button}
+                                                size='small'
+                                             >
+                                                Voltar
+                                             </Button>
+                                             {activeStep ===
+                                             steps.length - 1 ? (
+                                                <React.Fragment>
+                                                   <Button
+                                                      variant='contained'
+                                                      color='primary'
+                                                      size='small'
+                                                      type='submit'
+                                                      className={classes.button}
+                                                   >
+                                                      Salvar
+                                                   </Button>
+                                                   {loading && (
+                                                      <CircularProgress
+                                                         size={24}
+                                                         className={
+                                                            classes.buttonProgress
+                                                         }
+                                                      />
+                                                   )}
+                                                </React.Fragment>
+                                             ) : (
                                                 <Button
                                                    variant='contained'
                                                    color='primary'
                                                    size='small'
-                                                   type='submit'
+                                                   onClick={handleNext}
                                                    className={classes.button}
                                                 >
-                                                   Salvar
+                                                   Próximo
                                                 </Button>
-                                                {loading && (
-                                                   <CircularProgress
-                                                      size={24}
-                                                      className={
-                                                         classes.buttonProgress
-                                                      }
-                                                   />
-                                                )}
-                                             </React.Fragment>
-                                          ) : (
-                                             <Button
-                                                variant='contained'
-                                                color='primary'
-                                                size='small'
-                                                onClick={handleNext}
-                                                className={classes.button}
-                                             >
-                                                Próximo
-                                             </Button>
-                                          )}
-                                       </React.Fragment>
-                                    )}
-                                 </div>
-                              </StepContent>
-                           </Step>
-                        ))}
-                     </Stepper>
-                     {openAll && (
-                        <Button
-                           variant='contained'
-                           color='primary'
-                           size='small'
-                           type='submit'
-                           className={classes.buttonSubmit}
-                        >
-                           Salvar
-                        </Button>
-                     )}
-                     <Snackbar open={success}>
-                        <Alert variant='filled' severity='success'>
-                           Salvo com sucesso :D
-                        </Alert>
-                     </Snackbar>
-                     <Snackbar open={error}>
-                        <Alert variant='filled' severity='error'>
-                           Algo deu errado :(
-                        </Alert>
-                     </Snackbar>
-                  </form>
-               )
-            }}
-         </Formik>
+                                             )}
+                                          </React.Fragment>
+                                       )}
+                                    </div>
+                                 </StepContent>
+                              </Step>
+                           ))}
+                        </Stepper>
+                        {openAll && (
+                           <Button
+                              variant='contained'
+                              color='primary'
+                              size='small'
+                              type='submit'
+                              className={classes.buttonSubmit}
+                           >
+                              Salvar
+                           </Button>
+                        )}
+                        <Snackbar open={success}>
+                           <Alert variant='filled' severity='success'>
+                              Salvo com sucesso :D
+                           </Alert>
+                        </Snackbar>
+                        <Snackbar open={error}>
+                           <Alert variant='filled' severity='error'>
+                              Algo deu errado :(
+                           </Alert>
+                        </Snackbar>
+                     </form>
+                  )
+               }}
+            </Formik>
+         )}
       </Layout>
    )
 }

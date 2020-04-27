@@ -1,4 +1,4 @@
-import React, { useState, createRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
    TextField,
    Backdrop,
@@ -8,11 +8,14 @@ import {
    CardActions
 } from '@material-ui/core'
 import { DateRange } from 'react-date-range'
+import { makeStyles, withStyles } from '@material-ui/core/styles'
 import pt from 'date-fns/locale/pt-BR'
+
 import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 import './style.css'
-import { makeStyles, withStyles } from '@material-ui/core/styles'
+
+import { formatPTDate } from '../../helpers/date'
 
 const useStyles = makeStyles(theme => ({
    daterangeContainer: {
@@ -37,26 +40,71 @@ const MaterialDateRange = ({
    endDate,
    maxDate,
    setStartDate,
-   setEndDate
+   setEndDate,
+   inputRef
 }) => {
    const classes = useStyles()
-   const [preValue, setPreValue] = useState('')
    const [preDate, setPreDate] = useState([null, null])
    const [inputValue, setInputValue] = useState('')
    const [show, setShow] = useState(false)
    const [range, setRange] = useState([
       {
-         startDate: startDate || new Date(),
-         endDate: endDate || new Date(),
+         startDate: startDate ? new Date(startDate) : new Date(),
+         endDate: endDate ? new Date(endDate) : new Date(),
          key: 'selection',
          color: '#3f51b5'
       }
    ])
-   const options = { year: '2-digit', month: 'short', day: 'numeric' }
+
+   useEffect(() => {
+      const start = formatPTDate(startDate)
+      const end = formatPTDate(endDate)
+      const today = formatPTDate()
+
+      if (!startDate && !endDate) {
+         if (inputRef) {
+            inputRef.current.value = ''
+         }
+         setInputValue('')
+         return
+      }
+
+      if (!startDate) {
+         if (end === today) {
+            setInputValue('Hoje')
+            return
+         }
+         setInputValue(end)
+         return
+      }
+
+      if (!endDate) {
+         if (start === today) {
+            setInputValue('Hoje')
+            return
+         }
+         setInputValue(start)
+         return
+      }
+
+      if (start === end) {
+         if (start === today) {
+            setInputValue('Hoje')
+            return
+         }
+         setInputValue(start)
+         return
+      }
+
+      if (end === today) {
+         setInputValue(`${start} até hoje`)
+         return
+      }
+
+      setInputValue(`${start} até ${end}`)
+   }, [startDate, endDate])
 
    function open(e) {
-      setPreDate([new Date(), new Date()])
-      setPreValue('Hoje')
       e.preventDefault()
       e.target.blur()
       setShow(true)
@@ -65,7 +113,6 @@ const MaterialDateRange = ({
    function confirmRange() {
       setStartDate(preDate[0])
       setEndDate(preDate[1])
-      setInputValue(preValue)
       setShow(false)
    }
 
@@ -78,16 +125,19 @@ const MaterialDateRange = ({
          return
       }
 
-      const start = new Date(startDate).toLocaleDateString('pt-br', options)
-      const end = new Date(endDate).toLocaleDateString('pt-br', options)
+      const start = new Date(startDate).toDateString()
+      const end = new Date(endDate).toDateString()
+      const today = new Date().toDateString()
 
       if (start === end) {
-         setPreDate([new Date(startDate), new Date()])
-         setPreValue(`${start} até hoje`)
+         if (start === today) {
+            setPreDate([today, null])
+            return
+         }
+         setPreDate([start, null])
          return
       }
-      setPreDate([new Date(startDate), new Date(endDate)])
-      setPreValue(`${start} até ${end}`)
+      setPreDate([start, end])
    }
 
    return (
@@ -98,6 +148,7 @@ const MaterialDateRange = ({
             variant={variant || 'outlined'}
             onClick={open}
             value={inputValue}
+            inputRef={inputRef}
             fullWidth
          />
          <Backdrop className={classes.backdrop} open={show}>

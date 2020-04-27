@@ -30,6 +30,8 @@ export function* addPatient({ payload: { data: content } }) {
 
 export function* updatePatient({ payload: { data: content } }) {
    const { id, ...rest } = content
+   delete rest.toSearch
+   delete rest.dailyNas
 
    try {
       const currentData = yield select(state => state.patients.data)

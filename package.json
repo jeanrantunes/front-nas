@@ -19,6 +19,7 @@
       "formik-material-ui": "^2.0.0-beta.1",
       "formik-material-ui-pickers": "0.0.8",
       "lodash-es": "^4.17.15",
+      "query-string": "^6.12.1",
       "react": "^16.13.1",
       "react-async": "^10.0.1",
       "react-date-range": "^1.0.3",

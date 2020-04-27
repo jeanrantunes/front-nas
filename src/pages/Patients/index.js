@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
@@ -17,11 +17,12 @@ import {
    InputLabel,
    Select,
    MenuItem,
-   CircularProgress
+   CircularProgress,
+   Menu
 } from '@material-ui/core'
 import { Pagination } from '@material-ui/lab'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
-import { Delete } from '@material-ui/icons'
+import { Delete, FilterList, Close } from '@material-ui/icons'
 import DateRange from '../../components/MaterialDateRange'
 import { debounce } from 'lodash-es'
 
@@ -29,19 +30,36 @@ import { requestPatients, removePatient } from '../../store/actions/patients'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
 import AnimatedBadge from '../../components/AnimatedBadge'
-import { height } from '@material-ui/system'
+
+const options = [
+   {
+      id: 1,
+      label: 'Mais recentes',
+      field: 'hospitalizationDate',
+      order: 'DESC'
+   },
+   {
+      id: 2,
+      label: 'Mais antigos',
+      field: 'hospitalizationDate',
+      order: 'ASC'
+   }
+]
 
 const useStyles = makeStyles(theme => ({
    items: {
       width: '100%',
-      minHeight: 300,
       padding: 0,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'
    },
+   containerLoading: {
+      minHeight: 300
+   },
    list: {
-      width: '100%'
+      width: '100%',
+      padding: 0
    },
    filter: {
       padding: theme.spacing(2),
@@ -54,6 +72,9 @@ const useStyles = makeStyles(theme => ({
       marginTop: theme.spacing(5),
       display: 'flex',
       justifyContent: 'center'
+   },
+   filterButtons: {
+      flexFlow: 'row'
    }
 }))
 
@@ -63,7 +84,6 @@ const Patients = () => {
    const [patientId, setPatientId] = useState(null)
    const [page, setPage] = useState(0)
    const [name, setName] = useState('')
-   const [nameIsItEdit, setNameIsItEdit] = useState(false)
    const [outcome, setOutcome] = useState('')
    const [bed, setBed] = useState('')
    const [hospitalizationStartDate, setHospitalizationStartDate] = useState(
@@ -72,6 +92,15 @@ const Patients = () => {
    const [hospitalizationEndDate, setHospitalizationEndDate] = useState(null)
    const [outcomeStartDate, setOutcomeStartDate] = useState(null)
    const [outcomeEndDate, setOutcomeEndDate] = useState(null)
+   const [anchorEl, setAnchorEl] = React.useState(null)
+   const [sortedBy, setSortedBy] = useState(1)
+   const openMenuOrder = Boolean(anchorEl)
+
+   const nameInputRef = useRef(null)
+   const outcomeInputRef = useRef(null)
+   const bedInputRef = useRef(null)
+   const hospitalizationInputRef = useRef(null)
+   const outcomeDateInputRef = useRef(null)
 
    const dispatch = useDispatch()
    const classes = useStyles()
@@ -87,8 +116,30 @@ const Patients = () => {
       setDeleteDialog(true)
    }
 
-   function handlePagination(event, page) {
+   function handlePagination(e, page) {
       setPage(page - 1)
+   }
+
+   function handleOrder(selected) {
+      setSortedBy(selected.id)
+      setAnchorEl(null)
+   }
+
+   function cleanFilters() {
+      setPage(0)
+      setName('')
+      setOutcome('')
+      setBed('')
+      setHospitalizationEndDate(null)
+      setHospitalizationStartDate(null)
+      setOutcomeEndDate(null)
+      setOutcomeStartDate(null)
+      setSortedBy(1)
+      nameInputRef.current.value = ''
+      outcomeInputRef.current.value = ''
+      bedInputRef.current.value = ''
+      hospitalizationInputRef.current.value = ''
+      outcomeInputRef.current.value = ''
    }
 
    useEffect(() => {
@@ -98,11 +149,13 @@ const Patients = () => {
             page,
             name: name.length ? name : null,
             outcome: outcome.length ? outcome : null,
-            bed: bed.length || null,
+            bed: bed.length ? bed : null,
             hospitalizationStartDate,
             hospitalizationEndDate,
             outcomeStartDate,
-            outcomeEndDate
+            outcomeEndDate,
+            orderBy: options.find(o => o.id === sortedBy).field,
+            orderType: options.find(o => o.id === sortedBy).order
          })
       )
    }, [
@@ -114,7 +167,8 @@ const Patients = () => {
       hospitalizationStartDate,
       hospitalizationEndDate,
       outcomeStartDate,
-      outcomeEndDate
+      outcomeEndDate,
+      sortedBy
    ])
 
    return (
@@ -126,6 +180,7 @@ const Patients = () => {
                      id='name'
                      label='Nome'
                      variant='outlined'
+                     inputRef={nameInputRef}
                      onChange={e => handleInputName(e.target.value)}
                      fullWidth
                   />
@@ -137,7 +192,8 @@ const Patients = () => {
                         labelId='outcome-label'
                         id='outcome'
                         value={outcome}
-                        onChange={handleInputName}
+                        inputRef={outcomeInputRef}
+                        onChange={e => setOutcome(e.target.value)}
                         label='Desfecho'
                      >
                         <MenuItem value=''>
@@ -156,6 +212,7 @@ const Patients = () => {
                         labelId='bed-label'
                         id='bed'
                         value={bed}
+                        inputRef={bedInputRef}
                         onChange={e => setBed(e.target.value)}
                         label='Leito'
                      >
@@ -177,25 +234,72 @@ const Patients = () => {
                      endDate={hospitalizationEndDate}
                      id='hospitalization-range'
                      label='Período de internação'
+                     inputRef={hospitalizationInputRef}
                      setStartDate={setHospitalizationStartDate}
                      setEndDate={setHospitalizationEndDate}
                   />
                </Grid>
-               <Grid item xs={12} sm={6}>
+               <Grid item xs={11} sm={5}>
                   <DateRange
                      startDate={outcomeStartDate}
                      endDate={outcomeEndDate}
                      id='outcome-range'
                      label='Período desfecho'
+                     inputRef={outcomeDateInputRef}
                      setStartDate={setOutcomeStartDate}
                      setEndDate={setOutcomeEndDate}
                   />
+               </Grid>
+               <Grid
+                  item
+                  xs={1}
+                  container
+                  direction='row'
+                  justify='center'
+                  alignItems='center'
+                  className={classes.filterButtons}
+               >
+                  <IconButton
+                     aria-label='more'
+                     aria-controls='long-menu'
+                     aria-haspopup='true'
+                     onClick={e => setAnchorEl(e.currentTarget)}
+                  >
+                     <FilterList />
+                  </IconButton>
+                  <Menu
+                     id='long-menu'
+                     anchorEl={anchorEl}
+                     keepMounted
+                     open={openMenuOrder}
+                     onClose={() => setAnchorEl(null)}
+                  >
+                     {options.map(option => (
+                        <MenuItem
+                           key={option.id}
+                           selected={option.id === sortedBy}
+                           onClick={() => handleOrder(option)}
+                        >
+                           {option.label}
+                        </MenuItem>
+                     ))}
+                  </Menu>
+                  <IconButton
+                     aria-label='more'
+                     aria-controls='long-menu'
+                     aria-haspopup='true'
+                     onClick={cleanFilters}
+                  >
+                     <Close />
+                  </IconButton>
                </Grid>
             </Grid>
          </Paper>
          <Paper elevation={2} className={classes.items}>
             {patients.loading ? (
-               <CircularProgress />
+               <div className={classes.containerLoading}>
+                  <CircularProgress />
+               </div>
             ) : (
                <List className={classes.list}>
                   {patients.data.map((patient, index) => {
@@ -222,8 +326,6 @@ const Patients = () => {
                                        <Avatar>{patient.bed}</Avatar>
                                     </AnimatedBadge>
                                  ) : (
-                                    //    <Avatar>{patient.bed}</Avatar>
-                                    // </StyledBadge>
                                     <Avatar>{patient.bed}</Avatar>
                                  )}
                               </ListItemIcon>
@@ -231,16 +333,17 @@ const Patients = () => {
                                  id={labelId}
                                  primary={patient.name}
                                  secondary={
-                                    patient.outcomeDate
-                                       ? `Desfecho: ${
-                                            patient.outcome
-                                         } - ${new Date(
-                                            patient.outcomeDate
-                                         ).toUTCString()}`
-                                       : patient.hospitalizationDate &&
-                                         `Entrada: ${new Date(
-                                            patient.hospitalizationDate
-                                         ).toUTCString()}`
+                                    `Data da internação: ${patient.hospitalizationDate}`
+                                    // patient.outcomeDate
+                                    //    && `Desfecho: ${
+                                    //         patient.outcome
+                                    //      } - ${new Date(
+                                    //         patient.outcomeDate
+                                    //      ).toUTCString()}`
+                                    //    : patient.hospitalizationDate &&
+                                    //      `Entrada: ${new Date(
+                                    //         patient.hospitalizationDate
+                                    //      ).toUTCString()}`
                                  }
                               />
                               <ListItemSecondaryAction>
@@ -262,7 +365,7 @@ const Patients = () => {
          {patients.metadata && patients.metadata.total > itemsPerPage && (
             <div className={classes.pagination}>
                <Pagination
-                  count={Math.round(
+                  count={Math.ceil(
                      patients.metadata.total / patients.metadata.itemsPerPage
                   )}
                   size='large'

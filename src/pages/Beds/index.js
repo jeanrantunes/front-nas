@@ -83,9 +83,11 @@ const MenuPatient = props => {
          onClose={close}
       >
          <MenuItem component={Link} to={`/patient/${patient.id}`}>
-            Editar
+            Editar dados
          </MenuItem>
-         <MenuItem>Registrar NAS</MenuItem>
+         <MenuItem component={Link} to={`/nas?patientId=${patient.id}`}>
+            Histórico NAS
+         </MenuItem>
          <MenuItem onClick={deletePatient}>Excluir</MenuItem>
       </Menu>
    )
@@ -399,9 +401,12 @@ const Beds = props => {
 
          {deleteDialog && (
             <DeleteDialog
+               title={'Tem certeza que deseja excluir o paciente?'}
+               text={' Não será possível desfazer está ação...'}
                deleteDialog={deleteDialog}
                setDeleteDialog={setDeleteDialog}
-               patientId={patient.id}
+               id={patient.id}
+               funcRemove={removePatient}
             />
          )}
       </Layout>

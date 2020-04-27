@@ -15,14 +15,18 @@ export default function patients(state = INITIAL_STATE, action) {
       case 'UPDATE_PATIENT':
          return { ...state, loading: true }
       case 'REQUEST_PATIENT':
-         return { filter: action.payload.filter, ...state, loading: true }
+         return {
+            ...state,
+            filter: action.payload.filter || null,
+            loading: true
+         }
       case 'SUCCESS_PATIENT':
          return {
             data: action.payload.data,
             metadata: action.payload.metadata,
             loading: false,
             error: false,
-            filter: null
+            filter: action.payload.filter || null
          }
       case 'FAILURE_PATIENT':
          return { ...state, loading: false, error: true, filter: null }
