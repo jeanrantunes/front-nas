@@ -93,7 +93,7 @@ const Signup = () => {
                      passwordConfirmation,
                      ...rest
                   } = values
-                  const response = await signup({
+                  await signup({
                      name: `${name} ${lastname}`,
                      role: 'USER',
                      ...rest
@@ -107,13 +107,10 @@ const Signup = () => {
                      values,
                      touched,
                      errors,
-                     dirty,
-                     isSubmitting,
-                     submitForm,
+
                      handleChange,
                      handleBlur,
-                     handleSubmit,
-                     handleReset
+                     handleSubmit
                   } = props
                   return (
                      <form

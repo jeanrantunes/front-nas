@@ -17,14 +17,15 @@ import {
    InputLabel,
    Select,
    MenuItem,
-   CircularProgress,
-   Menu
+   Menu,
+   useMediaQuery
 } from '@material-ui/core'
-import { Pagination } from '@material-ui/lab'
-import { makeStyles, withStyles } from '@material-ui/core/styles'
+import { Pagination, Skeleton } from '@material-ui/lab'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { Delete, FilterList, Close } from '@material-ui/icons'
 import DateRange from '../../components/MaterialDateRange'
 import { debounce } from 'lodash-es'
+import { formatPTDateTime } from '../../helpers/date'
 
 import { requestPatients, removePatient } from '../../store/actions/patients'
 import Layout from '../../Layouts/dashboard'
@@ -35,13 +36,13 @@ const options = [
    {
       id: 1,
       label: 'Mais recentes',
-      field: 'hospitalizationDate',
+      field: 'hospitalization_date',
       order: 'DESC'
    },
    {
       id: 2,
       label: 'Mais antigos',
-      field: 'hospitalizationDate',
+      field: 'hospitalization_date',
       order: 'ASC'
    }
 ]
@@ -78,20 +79,64 @@ const useStyles = makeStyles(theme => ({
    }
 }))
 
+const SkeletonList = () => {
+   const classes = useStyles()
+   const array = []
+   for (let i = 0; i < 10; i++) {
+      array.push(
+         <React.Fragment key={i}>
+            {i !== 0 && <Divider />}
+            <ListItem className={classes.listItem} dense button>
+               <ListItemIcon>
+                  <Skeleton
+                     animation='wave'
+                     variant='circle'
+                     width={40}
+                     height={40}
+                  />
+               </ListItemIcon>
+               <Grid item xs={7} sm={10} md={12}>
+                  <ListItemText
+                     primary={
+                        <Skeleton
+                           animation='wave'
+                           height={20}
+                           width='60%'
+                           style={{ marginBottom: 6 }}
+                        />
+                     }
+                     secondary={
+                        <Skeleton
+                           animation='wave'
+                           height={20}
+                           width='30%'
+                           style={{ marginBottom: 6 }}
+                        />
+                     }
+                  />
+               </Grid>
+            </ListItem>
+         </React.Fragment>
+      )
+   }
+   return <List className={classes.list}>{array}</List>
+}
+
 const Patients = () => {
    const patients = useSelector(store => store.patients)
-
+   const theme = useTheme()
+   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
    const [patientId, setPatientId] = useState(null)
    const [page, setPage] = useState(0)
    const [name, setName] = useState('')
    const [outcome, setOutcome] = useState('')
    const [bed, setBed] = useState('')
-   const [hospitalizationStartDate, setHospitalizationStartDate] = useState(
+   const [hospitalization_start_date, setHospitalizationStartDate] = useState(
       null
    )
-   const [hospitalizationEndDate, setHospitalizationEndDate] = useState(null)
-   const [outcomeStartDate, setOutcomeStartDate] = useState(null)
-   const [outcomeEndDate, setOutcomeEndDate] = useState(null)
+   const [hospitalization_end_date, setHospitalizationEndDate] = useState(null)
+   const [outcome_start_date, setOutcomeStartDate] = useState(null)
+   const [outcome_end_date, setOutcomeEndDate] = useState(null)
    const [anchorEl, setAnchorEl] = React.useState(null)
    const [sortedBy, setSortedBy] = useState(1)
    const openMenuOrder = Boolean(anchorEl)
@@ -105,7 +150,7 @@ const Patients = () => {
    const dispatch = useDispatch()
    const classes = useStyles()
    const [deleteDialog, setDeleteDialog] = useState(false)
-   const itemsPerPage = 8
+   const items_per_page = 8
 
    const handleInputName = debounce(name => {
       setName(name)
@@ -145,17 +190,17 @@ const Patients = () => {
    useEffect(() => {
       dispatch(
          requestPatients({
-            itemsPerPage,
+            items_per_page,
             page,
             name: name.length ? name : null,
             outcome: outcome.length ? outcome : null,
             bed: bed.length ? bed : null,
-            hospitalizationStartDate,
-            hospitalizationEndDate,
-            outcomeStartDate,
-            outcomeEndDate,
-            orderBy: options.find(o => o.id === sortedBy).field,
-            orderType: options.find(o => o.id === sortedBy).order
+            hospitalization_start_date,
+            hospitalization_end_date,
+            outcome_start_date,
+            outcome_end_date,
+            order_by: options.find(o => o.id === sortedBy).field,
+            order_type: options.find(o => o.id === sortedBy).order
          })
       )
    }, [
@@ -164,10 +209,10 @@ const Patients = () => {
       name,
       outcome,
       bed,
-      hospitalizationStartDate,
-      hospitalizationEndDate,
-      outcomeStartDate,
-      outcomeEndDate,
+      hospitalization_start_date,
+      hospitalization_end_date,
+      outcome_start_date,
+      outcome_end_date,
       sortedBy
    ])
 
@@ -175,17 +220,19 @@ const Patients = () => {
       <Layout>
          <Paper elevation={1} className={classes.filter}>
             <Grid container component='main' spacing={2}>
-               <Grid item xs={12} sm={6} md={4}>
+               <Grid item xs={12} sm={6} lg={4}>
                   <TextField
                      id='name'
+                     autoComplete='off'
                      label='Nome'
                      variant='outlined'
                      inputRef={nameInputRef}
                      onChange={e => handleInputName(e.target.value)}
                      fullWidth
+                     disabled={patients.loading}
                   />
                </Grid>
-               <Grid item xs={12} sm={6} md={4}>
+               <Grid item xs={12} sm={6} lg={4}>
                   <FormControl variant='outlined' fullWidth>
                      <InputLabel id='outcome-label'>Desfecho</InputLabel>
                      <Select
@@ -195,6 +242,7 @@ const Patients = () => {
                         inputRef={outcomeInputRef}
                         onChange={e => setOutcome(e.target.value)}
                         label='Desfecho'
+                        disabled={patients.loading}
                      >
                         <MenuItem value=''>
                            <em>Todos</em>
@@ -205,7 +253,7 @@ const Patients = () => {
                      </Select>
                   </FormControl>
                </Grid>
-               <Grid item xs={12} sm={6} md={4}>
+               <Grid item xs={12} sm={6} lg={4}>
                   <FormControl variant='outlined' fullWidth>
                      <InputLabel id='bed-label'>Leito</InputLabel>
                      <Select
@@ -215,6 +263,7 @@ const Patients = () => {
                         inputRef={bedInputRef}
                         onChange={e => setBed(e.target.value)}
                         label='Leito'
+                        disabled={patients.loading}
                      >
                         <MenuItem value=''>
                            <em>Todos</em>
@@ -228,34 +277,38 @@ const Patients = () => {
                      </Select>
                   </FormControl>
                </Grid>
-               <Grid item xs={12} sm={6}>
+               <Grid item xs={12} sm={6} lg={6}>
                   <DateRange
-                     startDate={hospitalizationStartDate}
-                     endDate={hospitalizationEndDate}
+                     startDate={hospitalization_start_date}
+                     endDate={hospitalization_end_date}
                      id='hospitalization-range'
                      label='Período de internação'
                      inputRef={hospitalizationInputRef}
                      setStartDate={setHospitalizationStartDate}
                      setEndDate={setHospitalizationEndDate}
+                     disabled={patients.loading}
                   />
                </Grid>
-               <Grid item xs={11} sm={5}>
+               <Grid item xs={12} sm={6} lg={5}>
                   <DateRange
-                     startDate={outcomeStartDate}
-                     endDate={outcomeEndDate}
+                     startDate={outcome_start_date}
+                     endDate={outcome_end_date}
                      id='outcome-range'
                      label='Período desfecho'
                      inputRef={outcomeDateInputRef}
                      setStartDate={setOutcomeStartDate}
                      setEndDate={setOutcomeEndDate}
+                     disabled={patients.loading}
                   />
                </Grid>
                <Grid
                   item
-                  xs={1}
+                  xs={12}
+                  sm={6}
+                  lg={1}
                   container
                   direction='row'
-                  justify='center'
+                  justify={isMobile ? 'flex-end' : 'center'}
                   alignItems='center'
                   className={classes.filterButtons}
                >
@@ -273,6 +326,7 @@ const Patients = () => {
                      keepMounted
                      open={openMenuOrder}
                      onClose={() => setAnchorEl(null)}
+                     disabled={patients.loading}
                   >
                      {options.map(option => (
                         <MenuItem
@@ -297,9 +351,7 @@ const Patients = () => {
          </Paper>
          <Paper elevation={2} className={classes.items}>
             {patients.loading ? (
-               <div className={classes.containerLoading}>
-                  <CircularProgress />
-               </div>
+               <SkeletonList />
             ) : (
                <List className={classes.list}>
                   {patients.data.map((patient, index) => {
@@ -320,7 +372,7 @@ const Patients = () => {
                                     <AnimatedBadge
                                        vertical='bottom'
                                        horizontal='right'
-                                       color='success'
+                                       color='#76ff03'
                                        overlap='circle'
                                     >
                                        <Avatar>{patient.bed}</Avatar>
@@ -329,23 +381,27 @@ const Patients = () => {
                                     <Avatar>{patient.bed}</Avatar>
                                  )}
                               </ListItemIcon>
-                              <ListItemText
-                                 id={labelId}
-                                 primary={patient.name}
-                                 secondary={
-                                    `Data da internação: ${patient.hospitalizationDate}`
-                                    // patient.outcomeDate
-                                    //    && `Desfecho: ${
-                                    //         patient.outcome
-                                    //      } - ${new Date(
-                                    //         patient.outcomeDate
-                                    //      ).toUTCString()}`
-                                    //    : patient.hospitalizationDate &&
-                                    //      `Entrada: ${new Date(
-                                    //         patient.hospitalizationDate
-                                    //      ).toUTCString()}`
-                                 }
-                              />
+                              <Grid item xs={7} sm={10} md={12}>
+                                 <ListItemText
+                                    id={labelId}
+                                    primary={patient.name}
+                                    secondary={
+                                       `Data da internação: ${formatPTDateTime(
+                                          patient.hospitalization_date
+                                       )}`
+                                       // patient.outcomeDate
+                                       //    && `Desfecho: ${
+                                       //         patient.outcome
+                                       //      } - ${new Date(
+                                       //         patient.outcomeDate
+                                       //      ).toUTCString()}`
+                                       //    : patient.hospitalizationDate &&
+                                       //      `Entrada: ${new Date(
+                                       //         patient.hospitalizationDate
+                                       //      ).toUTCString()}`
+                                    }
+                                 />
+                              </Grid>
                               <ListItemSecondaryAction>
                                  <IconButton
                                     edge='end'
@@ -362,11 +418,11 @@ const Patients = () => {
                </List>
             )}
          </Paper>
-         {patients.metadata && patients.metadata.total > itemsPerPage && (
+         {patients.metadata && patients.metadata.total > items_per_page && (
             <div className={classes.pagination}>
                <Pagination
                   count={Math.ceil(
-                     patients.metadata.total / patients.metadata.itemsPerPage
+                     patients.metadata.total / patients.metadata.items_per_page
                   )}
                   size='large'
                   onChange={handlePagination}

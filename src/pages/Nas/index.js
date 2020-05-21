@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
-import clsx from 'clsx'
-import { Formik, Field } from 'formik'
+import { Formik } from 'formik'
 import {
    Grid,
    Button,
    FormControl,
    Snackbar,
-   CircularProgress,
    RadioGroup,
    FormControlLabel,
    Radio,
@@ -17,7 +13,6 @@ import {
    StepLabel,
    StepContent,
    Typography,
-   Paper,
    Switch
 } from '@material-ui/core'
 
@@ -28,9 +23,10 @@ import { green, red } from '@material-ui/core/colors'
 import { makeStyles } from '@material-ui/core/styles'
 
 import Layout from '../../Layouts/dashboard'
-import Loader from '../../components/Loader'
 import api from '../../services/api'
+import ButtonLoading from '../../components/ButtonLoading'
 import { isEmpty } from 'lodash-es'
+import { getQueryStringValue } from '../../helpers/queryString'
 
 const useStyles = makeStyles(theme => ({
    paper: {
@@ -59,18 +55,10 @@ const useStyles = makeStyles(theme => ({
    noLabel: {
       marginTop: theme.spacing(3)
    },
-   wrapper: {
+   wrapperLoading: {
       marginTop: theme.spacing(3),
       float: 'right',
       position: 'relative'
-   },
-   buttonProgress: {
-      color: green[500],
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
    },
    success: {
       backgroundColor: green[500],
@@ -80,14 +68,17 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: red[500],
       color: theme.white
    },
-   buttonSuccess: {
-      backgroundColor: green[500],
-      '&:hover': {
-         backgroundColor: green[700]
-      }
-   },
    controlradio: {
-      marginTop: theme.spacing(1)
+      marginTop: theme.spacing(1),
+      [theme.breakpoints.down('sm')]: {
+         alignItems: 'start',
+         marginTop: theme.spacing(3),
+         marginRight: 0,
+         '& > span': {
+            padding: 4,
+            fontSize: theme.typography.body2.fontSize
+         }
+      }
    },
    radio: {
       padding: `0 ${theme.spacing(2)}px`
@@ -96,10 +87,27 @@ const useStyles = makeStyles(theme => ({
       marginTop: theme.spacing(3)
    },
    buttonSubmit: {
-      marginLeft: theme.spacing(6)
+      // marginLeft: theme.spacing(6),
+      [theme.breakpoints.down('sm')]: {
+         float: 'right'
+      }
    },
    expandButton: {
       float: 'right'
+   },
+   stepper: {
+      [theme.breakpoints.down('sm')]: {
+         padding: 0
+      }
+   },
+   stepperContent: {
+      [theme.breakpoints.down('sm')]: {
+         paddingRight: 0,
+         paddingLeft: 14,
+         '& p': {
+            fontSize: theme.typography.body2.fontSize
+         }
+      }
    }
 }))
 
@@ -111,8 +119,8 @@ function getStepContent(step, classes, values, handleChange) {
                <RadioGroup
                   row
                   aria-label='position'
-                  name='monitoringAndControls'
-                  value={values.monitoringAndControls}
+                  name='monitoring_and_controls'
+                  value={values.monitoring_and_controls}
                   onChange={handleChange}
                >
                   <FormControlLabel
@@ -160,9 +168,9 @@ function getStepContent(step, classes, values, handleChange) {
                   <Grid item>
                      <Switch
                         color='primary'
-                        name='laboratoryInvestigations'
+                        name='laboratory_investigations'
                         onChange={handleChange}
-                        checked={values.laboratoryInvestigations}
+                        checked={values.laboratory_investigations}
                      />
                   </Grid>
                   <Grid item>
@@ -187,8 +195,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='medicationExceptVasoactiveDrugs'
-                        checked={values.medicationExceptVasoactiveDrugs}
+                        name='medication_except_vasoactive_drugs'
+                        checked={values.medication_except_vasoactive_drugs}
                      />
                   </Grid>
                   <Grid item>
@@ -203,8 +211,8 @@ function getStepContent(step, classes, values, handleChange) {
                <RadioGroup
                   row
                   aria-label='position'
-                  name='hygieneProcedures'
-                  value={values.hygieneProcedures}
+                  name='hygiene_procedures'
+                  value={values.hygiene_procedures}
                   onChange={handleChange}
                >
                   <FormControlLabel
@@ -253,8 +261,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='caringForDrains'
-                        checked={values.caringForDrains}
+                        name='caring_for_drains'
+                        checked={values.caring_for_drains}
                      />
                   </Grid>
                   <Grid item>
@@ -275,8 +283,8 @@ function getStepContent(step, classes, values, handleChange) {
                <RadioGroup
                   row
                   aria-label='position'
-                  name='mobilizationAndPositioning'
-                  value={values.mobilizationAndPositioning}
+                  name='mobilization_and_positioning'
+                  value={values.mobilization_and_positioning}
                   onChange={handleChange}
                >
                   <FormControlLabel
@@ -321,8 +329,8 @@ function getStepContent(step, classes, values, handleChange) {
                <RadioGroup
                   row
                   aria-label='position'
-                  name='supportAndCare'
-                  value={values.supportAndCare}
+                  name='support_and_care'
+                  value={values.support_and_care}
                   onChange={handleChange}
                >
                   <FormControlLabel
@@ -350,8 +358,8 @@ function getStepContent(step, classes, values, handleChange) {
                <RadioGroup
                   row
                   aria-label='position'
-                  name='administrativeAndManagerialTasks'
-                  value={values.administrativeAndManagerialTasks}
+                  name='administrative_and_managerial_tasks'
+                  value={values.administrative_and_managerial_tasks}
                   onChange={handleChange}
                >
                   <FormControlLabel
@@ -405,8 +413,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='ventilatorySupport'
-                        checked={values.ventilatorySupport}
+                        name='ventilatory_support'
+                        checked={values.ventilatory_support}
                      />
                   </Grid>
                   <Grid item>
@@ -436,8 +444,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='artificialAirways'
-                        checked={values.artificialAirways}
+                        name='artificial_airways'
+                        checked={values.artificial_airways}
                      />
                   </Grid>
                   <Grid item>
@@ -466,8 +474,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='lungFunction'
-                        checked={values.lungFunction}
+                        name='lung_function'
+                        checked={values.lung_function}
                      />
                   </Grid>
                   <Grid item>
@@ -496,8 +504,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='vasoactiveDrugs'
-                        checked={values.vasoactiveDrugs}
+                        name='vasoactive_drugs'
+                        checked={values.vasoactive_drugs}
                      />
                   </Grid>
                   <Grid item>
@@ -527,8 +535,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='intravenousReplacement'
-                        checked={values.intravenousReplacement}
+                        name='intravenous_replacement'
+                        checked={values.intravenous_replacement}
                      />
                   </Grid>
                   <Grid item>
@@ -557,8 +565,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='monitoringOfTheLeftAtrium'
-                        checked={values.monitoringOfTheLeftAtrium}
+                        name='monitoring_of_the_left_atrium'
+                        checked={values.monitoring_of_the_left_atrium}
                      />
                   </Grid>
                   <Grid item>
@@ -587,8 +595,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='cardiorespiratoryResumption'
-                        checked={values.cardiorespiratoryResumption}
+                        name='cardiorespiratory_resumption'
+                        checked={values.cardiorespiratory_resumption}
                      />
                   </Grid>
                   <Grid item>
@@ -616,8 +624,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='hemofiltrationTechniques'
-                        checked={values.hemofiltrationTechniques}
+                        name='hemofiltration_techniques'
+                        checked={values.hemofiltration_techniques}
                      />
                   </Grid>
                   <Grid item>
@@ -646,8 +654,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='urineOutput'
-                        checked={values.urineOutput}
+                        name='urine_output'
+                        checked={values.urine_output}
                      />
                   </Grid>
                   <Grid item>
@@ -675,8 +683,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='intracranialPressure'
-                        checked={values.intracranialPressure}
+                        name='intracranial_pressure'
+                        checked={values.intracranial_pressure}
                      />
                   </Grid>
                   <Grid item>
@@ -704,8 +712,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='acidosisTreatment'
-                        checked={values.acidosisTreatment}
+                        name='acidosis_treatment'
+                        checked={values.acidosis_treatment}
                      />
                   </Grid>
                   <Grid item>
@@ -730,8 +738,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='intravenousHyperalimentation'
-                        checked={values.intravenousHyperalimentation}
+                        name='intravenous_hyperalimentation'
+                        checked={values.intravenous_hyperalimentation}
                      />
                   </Grid>
                   <Grid item>
@@ -760,8 +768,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='enteralFeeding'
-                        checked={values.enteralFeeding}
+                        name='enteral_feeding'
+                        checked={values.enteral_feeding}
                      />
                   </Grid>
                   <Grid item>
@@ -795,8 +803,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='specificInterventionsInTheUnit'
-                        checked={values.specificInterventionsInTheUnit}
+                        name='specific_interventions_in_the_unit'
+                        checked={values.specific_interventions_in_the_unit}
                      />
                   </Grid>
                   <Grid item>
@@ -827,8 +835,8 @@ function getStepContent(step, classes, values, handleChange) {
                      <Switch
                         onChange={handleChange}
                         color='primary'
-                        name='specificInterventionsOutsideTheUnit'
-                        checked={values.specificInterventionsOutsideTheUnit}
+                        name='specific_interventions_outside_the_unit'
+                        checked={values.specific_interventions_outside_the_unit}
                      />
                   </Grid>
                   <Grid item>
@@ -837,6 +845,8 @@ function getStepContent(step, classes, values, handleChange) {
                </Grid>
             </FormControl>
          )
+      default:
+         return
    }
 }
 
@@ -872,7 +882,6 @@ const Nas = props => {
    const classes = useStyles()
 
    const { id } = props.match.params
-   const nasList = useSelector(state => state.nas.data)
 
    const [nas, setNas] = useState(null)
    const [openAll, setOpenAll] = useState(false)
@@ -881,33 +890,29 @@ const Nas = props => {
    const [error, setError] = useState(false)
    const timeSnack = 2000
 
-   const buttonClassname = clsx({
-      [classes.buttonSuccess]: success
-   })
+   useEffect(() => {
+      if (!isEmpty(nas)) {
+         setOpenAll(true)
+      }
+   }, [nas])
 
    useEffect(() => {
       const getNas = async id => {
          try {
             const { data } = await api.get(`/v1/nas/${id}`)
             setNas(data)
-            setOpenAll(true)
-         } catch {
+         } catch (error) {
             setNas({})
          }
       }
       const idNas = parseInt(id)
       /* in this case its a create nas */
-      if (isNaN(idNas) || id.length > 23) {
-         setNas({})
-         return
-      }
-      if (nasList) {
-         setNas(nasList.find(n => n.id === idNas))
-      }
-      if (!nas) {
+      if (id && id.length < 23) {
          getNas(idNas)
+      } else if (id.length > 23) {
+         setNas({})
       }
-   }, [id, nasList])
+   }, [id])
 
    const [activeStep, setActiveStep] = React.useState(0)
    const steps = getSteps()
@@ -920,195 +925,216 @@ const Nas = props => {
       setActiveStep(prevActiveStep => prevActiveStep - 1)
    }
 
-   const handleReset = () => {
-      setActiveStep(0)
-   }
-
    return (
       <Layout>
-         <Button
-            variant='contained'
-            color='primary'
-            startIcon={openAll ? <UnfoldLess /> : <UnfoldMoreOutlined />}
-            onClick={() => setOpenAll(!openAll)}
-            className={classes.expandButton}
-         >
-            {openAll ? 'Retrair' : 'Expandir'}
-         </Button>
-         {nas && (
-            <Formik
-               initialValues={{
-                  monitoringAndControls: nas.monitoringAndControls || '1a',
-                  laboratoryInvestigations:
-                     nas.laboratoryInvestigations || false,
-                  medicationExceptVasoactiveDrugs:
-                     nas.medicationExceptVasoactiveDrugs || true,
-                  hygieneProcedures: nas.hygieneProcedures || '4a',
-                  caringForDrains: nas.caringForDrains || true,
-                  mobilizationAndPositioning:
-                     nas.mobilizationAndPositioning || '6b',
-                  supportAndCare: nas.supportAndCare || '7a',
-                  administrativeAndManagerialTasks:
-                     nas.administrativeAndManagerialTasks || '8b',
-                  ventilatorySupport: nas.ventilatorySupport || false,
-                  lungFunction: nas.lungFunction || true,
-                  artificialAirways: nas.artificialAirways || true,
-                  vasoactiveDrugs: nas.vasoactiveDrugs || false,
-                  intravenousReplacement: nas.intravenousReplacement || true,
-                  monitoringOfTheLeftAtrium:
-                     nas.monitoringOfTheLeftAtrium || true,
-                  cardiorespiratoryResumption:
-                     nas.cardiorespiratoryResumption || false,
-                  hemofiltrationTechniques:
-                     nas.hemofiltrationTechniques || false,
-                  urineOutput: nas.urineOutput || false,
-                  intracranialPressure: nas.intracranialPressure || false,
-                  acidosisTreatment: nas.acidosisTreatment || false,
-                  intravenousHyperalimentation:
-                     nas.intravenousHyperalimentation || false,
-                  enteralFeeding: nas.enteralFeeding || true,
-                  specificInterventionsInTheUnit:
-                     nas.specificInterventionsInTheUnit || false,
-                  specificInterventionsOutsideTheUnit:
-                     nas.specificInterventionsOutsideTheUnit || false
-               }}
-               onSubmit={async (values, { setSubmitting }) => {
-                  setLoading(true)
-                  setSuccess(false)
-                  try {
-                     if (isEmpty(nas)) {
-                        await api.post('v1/nas', { ...values, patientId: id })
-                     } else {
-                        await api.put(`v1/nas/${id}`, {
-                           ...values,
-                           patientId: nas.patientId
-                        })
-                     }
-
-                     setLoading(false)
-                     setSuccess(true)
-                     setError(false)
-
-                     setTimeout(() => {
-                        props.history.goBack()
+         <Grid container>
+            <Grid item xs={12}>
+               <Button
+                  variant='contained'
+                  color='primary'
+                  startIcon={openAll ? <UnfoldLess /> : <UnfoldMoreOutlined />}
+                  onClick={() => setOpenAll(!openAll)}
+                  className={classes.expandButton}
+               >
+                  {openAll ? 'Retrair' : 'Expandir'}
+               </Button>
+            </Grid>
+            <Grid item xs={12}>
+               {nas && (
+                  <Formik
+                     initialValues={{
+                        monitoring_and_controls:
+                           nas.monitoring_and_controls || '1a',
+                        laboratory_investigations:
+                           nas.laboratory_investigations || false,
+                        medication_except_vasoactive_drugs:
+                           nas.medication_except_vasoactive_drugs || true,
+                        hygiene_procedures: nas.hygiene_procedures || '4a',
+                        caring_for_drains: nas.caring_for_drains || true,
+                        mobilization_and_positioning:
+                           nas.mobilization_and_positioning || '6b',
+                        support_and_care: nas.support_and_care || '7a',
+                        administrative_and_managerial_tasks:
+                           nas.administrative_and_managerial_tasks || '8b',
+                        ventilatory_support: nas.ventilatory_support || false,
+                        lung_function: nas.lung_function || true,
+                        artificial_airways: nas.artificial_airways || true,
+                        vasoactive_drugs: nas.vasoactive_drugs || false,
+                        intravenous_replacement:
+                           nas.intravenous_replacement || true,
+                        monitoring_of_the_left_atrium:
+                           nas.monitoring_of_the_left_atrium || true,
+                        cardiorespiratory_resumption:
+                           nas.cardiorespiratory_resumption || false,
+                        hemofiltration_techniques:
+                           nas.hemofiltration_techniques || false,
+                        urine_output: nas.urine_output || false,
+                        intracranial_pressure:
+                           nas.intracranial_pressure || false,
+                        acidosis_treatment: nas.acidosis_treatment || false,
+                        intravenous_hyperalimentation:
+                           nas.intravenous_hyperalimentation || false,
+                        enteral_feeding: nas.enteral_feeding || true,
+                        specific_interventions_in_the_unit:
+                           nas.specific_interventions_in_the_unit || false,
+                        specific_interventions_outside_the_unit:
+                           nas.specific_interventions_outside_the_unit || false,
+                        nas_date: getQueryStringValue('nas_date')
+                           ? new Date(getQueryStringValue('nas_date'))
+                           : new Date()
+                     }}
+                     onSubmit={async (values, { setSubmitting }) => {
+                        setLoading(true)
                         setSuccess(false)
-                     }, timeSnack)
-                  } catch (err) {
-                     setLoading(false)
-                     setSuccess(false)
-                     setError(false)
-                     setTimeout(() => {
-                        setError(false)
-                     }, timeSnack)
-                  }
-               }}
-            >
-               {props => {
-                  const {
-                     values,
-                     touched,
-                     errors,
-                     handleChange,
-                     handleBlur,
-                     handleSubmit
-                  } = props
-                  return (
-                     <form
-                        className={classes.form}
-                        onSubmit={e => {
-                           e.preventDefault()
-                           handleSubmit()
-                        }}
-                        noValidate
-                     >
-                        <Stepper activeStep={activeStep} orientation='vertical'>
-                           {steps.map((label, index) => (
-                              <Step key={label} expanded={openAll}>
-                                 <StepLabel>{label}</StepLabel>
-                                 <StepContent>
-                                    {getStepContent(
-                                       index,
-                                       classes,
-                                       values,
-                                       handleChange
-                                    )}
+                        try {
+                           if (isEmpty(nas)) {
+                              await api.post('v1/nas', {
+                                 ...values,
+                                 patient_id: id
+                              })
+                           } else {
+                              delete values.nas_date
+                              await api.put(`v1/nas/${id}`, {
+                                 ...values,
+                                 patient_id: nas.patient_id
+                              })
+                           }
 
-                                    <div className={classes.actionsSteper}>
-                                       {!openAll && (
-                                          <React.Fragment>
-                                             <Button
-                                                disabled={activeStep === 0}
-                                                onClick={handleBack}
-                                                className={classes.button}
-                                                size='small'
-                                             >
-                                                Voltar
-                                             </Button>
-                                             {activeStep ===
-                                             steps.length - 1 ? (
+                           setLoading(false)
+                           setSuccess(true)
+                           setError(false)
+
+                           setTimeout(() => {
+                              props.history.goBack()
+                              setSuccess(false)
+                           }, timeSnack)
+                        } catch (err) {
+                           setLoading(false)
+                           setSuccess(false)
+                           setError(false)
+                           setTimeout(() => {
+                              setError(false)
+                           }, timeSnack)
+                        }
+                     }}
+                  >
+                     {props => {
+                        const {
+                           values,
+
+                           handleChange,
+
+                           handleSubmit
+                        } = props
+                        return (
+                           <form
+                              className={classes.form}
+                              onSubmit={e => {
+                                 e.preventDefault()
+                                 handleSubmit()
+                              }}
+                              noValidate
+                           >
+                              <Stepper
+                                 activeStep={activeStep}
+                                 orientation='vertical'
+                                 className={classes.stepper}
+                              >
+                                 {steps.map((label, index) => (
+                                    <Step key={label} expanded={openAll}>
+                                       <StepLabel>{label}</StepLabel>
+                                       <StepContent
+                                          className={classes.stepperContent}
+                                       >
+                                          {getStepContent(
+                                             index,
+                                             classes,
+                                             values,
+                                             handleChange
+                                          )}
+
+                                          <div
+                                             className={classes.actionsSteper}
+                                          >
+                                             {!openAll && (
                                                 <React.Fragment>
                                                    <Button
-                                                      variant='contained'
-                                                      color='primary'
-                                                      size='small'
-                                                      type='submit'
+                                                      disabled={
+                                                         activeStep === 0
+                                                      }
+                                                      onClick={handleBack}
                                                       className={classes.button}
+                                                      size='small'
                                                    >
-                                                      Salvar
+                                                      Voltar
                                                    </Button>
-                                                   {loading && (
-                                                      <CircularProgress
-                                                         size={24}
-                                                         className={
-                                                            classes.buttonProgress
+                                                   {activeStep ===
+                                                   steps.length - 1 ? (
+                                                      <ButtonLoading
+                                                         variant='contained'
+                                                         color='primary'
+                                                         type='submit'
+                                                         loading={loading}
+                                                         success={success}
+                                                         wrapperClass={
+                                                            classes.wrapperLoading
                                                          }
-                                                      />
+                                                         className={
+                                                            classes.button
+                                                         }
+                                                      >
+                                                         Salvar
+                                                      </ButtonLoading>
+                                                   ) : (
+                                                      <Button
+                                                         variant='contained'
+                                                         color='primary'
+                                                         size='small'
+                                                         onClick={handleNext}
+                                                         className={
+                                                            classes.button
+                                                         }
+                                                      >
+                                                         Próximo
+                                                      </Button>
                                                    )}
                                                 </React.Fragment>
-                                             ) : (
-                                                <Button
-                                                   variant='contained'
-                                                   color='primary'
-                                                   size='small'
-                                                   onClick={handleNext}
-                                                   className={classes.button}
-                                                >
-                                                   Próximo
-                                                </Button>
                                              )}
-                                          </React.Fragment>
-                                       )}
-                                    </div>
-                                 </StepContent>
-                              </Step>
-                           ))}
-                        </Stepper>
-                        {openAll && (
-                           <Button
-                              variant='contained'
-                              color='primary'
-                              size='small'
-                              type='submit'
-                              className={classes.buttonSubmit}
-                           >
-                              Salvar
-                           </Button>
-                        )}
-                        <Snackbar open={success}>
-                           <Alert variant='filled' severity='success'>
-                              Salvo com sucesso :D
-                           </Alert>
-                        </Snackbar>
-                        <Snackbar open={error}>
-                           <Alert variant='filled' severity='error'>
-                              Algo deu errado :(
-                           </Alert>
-                        </Snackbar>
-                     </form>
-                  )
-               }}
-            </Formik>
-         )}
+                                          </div>
+                                       </StepContent>
+                                    </Step>
+                                 ))}
+                              </Stepper>
+                              {openAll && (
+                                 <ButtonLoading
+                                    variant='contained'
+                                    color='primary'
+                                    type='submit'
+                                    loading={loading}
+                                    success={success}
+                                    wrapperClass={classes.wrapperLoading}
+                                    className={classes.buttonSubmit}
+                                 >
+                                    Salvar
+                                 </ButtonLoading>
+                              )}
+                              <Snackbar open={success}>
+                                 <Alert variant='filled' severity='success'>
+                                    Salvo com sucesso :D
+                                 </Alert>
+                              </Snackbar>
+                              <Snackbar open={error}>
+                                 <Alert variant='filled' severity='error'>
+                                    Algo deu errado :(
+                                 </Alert>
+                              </Snackbar>
+                           </form>
+                        )
+                     }}
+                  </Formik>
+               )}
+            </Grid>
+         </Grid>
       </Layout>
    )
 }

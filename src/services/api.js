@@ -1,10 +1,9 @@
 import { getToken } from '../helpers/token'
 import axios from 'axios'
 
-const base_url = 'http://localhost:3001'
-
 const api = axios.create({
-   baseURL: base_url
+   // baseURL: process.env.REACT_APP_BASE_URL_BASE_URL || 'http://localhost:3001'
+   baseURL: 'http://localhost:3001'
 })
 
 api.interceptors.request.use(async config => {
@@ -27,7 +26,8 @@ api.interceptors.response.use(
          error &&
          error.response &&
          error.response.status === 401 &&
-         window.location.pathname !== '/login'
+         window.location.pathname !== '/login' &&
+         window.location.pathname !== '/signup-confirm'
       ) {
          window.location.href = '/login'
          return

@@ -29,7 +29,7 @@ export default function nas(state = INITIAL_STATE, action) {
             ...state,
             loading: false,
             error: true,
-            filter: action.payload.filter || null
+            filter: null
          }
       default:
          return state

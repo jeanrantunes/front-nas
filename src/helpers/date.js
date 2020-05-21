@@ -9,6 +9,9 @@ const options2 = {
 }
 
 export const combineDateAndTime = (date, time) => {
+   if (!date || !time) {
+      return
+   }
    const dateIsoStr = new Date(date).toISOString()
    const dateStr = dateIsoStr.slice(0, dateIsoStr.indexOf('T'))
    const timeIsoStr = new Date(time).toISOString()
@@ -36,4 +39,17 @@ export const formatPTDateTime = date => {
       return new Date().toLocaleString('pt-br', options2)
    }
    return new Date(date).toLocaleString('pt-br', options2)
+}
+
+export const isItBirthday = date => {
+   if (!date) {
+      return false
+   }
+   const birthday = new Date(date)
+   const today = new Date()
+
+   return (
+      today.getDate() === birthday.getDate() &&
+      today.getMonth() === birthday.getMonth()
+   )
 }

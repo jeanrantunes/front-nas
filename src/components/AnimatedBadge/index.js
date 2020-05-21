@@ -2,7 +2,14 @@ import React from 'react'
 import { Badge } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 
-const AnimatedBadge = ({ children, overlap, vertical, horizontal, color }) => {
+const AnimatedBadge = ({
+   children,
+   overlap,
+   vertical,
+   horizontal,
+   color,
+   className
+}) => {
    const StyledBadge = withStyles(theme => {
       if (!color) {
          color = 'primary'
@@ -10,8 +17,8 @@ const AnimatedBadge = ({ children, overlap, vertical, horizontal, color }) => {
 
       return {
          badge: {
-            backgroundColor: theme.palette[color].main,
-            color: theme.palette[color].main,
+            backgroundColor: color,
+            color: color,
             boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
             width: 10,
             height: 10,
@@ -43,6 +50,7 @@ const AnimatedBadge = ({ children, overlap, vertical, horizontal, color }) => {
 
    return (
       <StyledBadge
+         className={className}
          overlap={overlap}
          anchorOrigin={{
             vertical,

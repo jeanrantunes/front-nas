@@ -17,9 +17,13 @@ export const nameValidation = {
    tooLong: 'O nome não pode ter mais de 40 caracteres'
 }
 
-export const saps3 = {
+export const saps3Validation = {
    required: 'É necessário preencher o SAPS 3',
    invalid: 'O SAPS 3 precisa ser válido',
    tooShort: 'O SAPS 3 precisa ser maior que 0',
    tooLong: 'O SAPS 3 não pode ser maior que 9999'
+}
+
+export const roleValidation = {
+   required: 'É necessário selecionar o nível de permissão'
 }

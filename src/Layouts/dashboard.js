@@ -1,8 +1,9 @@
-import React, { Component } from 'react'
+import React, { useEffect } from 'react'
 import clsx from 'clsx'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { Link } from 'react-router-dom'
 import {
+   CssBaseline,
    AppBar,
    Toolbar,
    Typography,
@@ -16,16 +17,25 @@ import {
    Box,
    Divider,
    IconButton,
-   Avatar
+   Avatar,
+   useMediaQuery
 } from '@material-ui/core'
+import {
+   AirlineSeatIndividualSuite,
+   Group,
+   List as ListIcon,
+   Menu,
+   Settings,
+   SupervisedUserCircle,
+   ExitToApp
+} from '@material-ui/icons'
 
-import { MoveToInbox, Mail, Menu, ExitToApp } from '@material-ui/icons'
 import { deepPurple } from '@material-ui/core/colors'
 
 import { useAuth } from '../context/auth'
 import { useUser } from '../context/user'
 
-const drawerWidth = 240
+const drawerWidth = 250
 
 const stylesLayout = makeStyles(theme => ({
    root: {
@@ -50,10 +60,6 @@ const stylesLayout = makeStyles(theme => ({
    drawerPaper: {
       width: drawerWidth
    },
-   content: {
-      flexGrow: 1,
-      padding: theme.spacing(3)
-   },
    toolbar: theme.mixins.toolbar,
    content: {
       flexGrow: 1,
@@ -62,6 +68,9 @@ const stylesLayout = makeStyles(theme => ({
          easing: theme.transitions.easing.sharp,
          duration: theme.transitions.duration.leavingScreen
       }),
+      [theme.breakpoints.down('sm')]: {
+         marginLeft: 0
+      },
       marginLeft: -drawerWidth
    },
    contentShift: {
@@ -89,21 +98,30 @@ function ListItemLink(props) {
 }
 
 const Layout = props => {
+   const theme = useTheme()
+   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
    const classes = stylesLayout()
-   const [open, setOpen] = React.useState(true)
+   const [open, setOpen] = React.useState(false)
    const { logout } = useAuth()
    const { user } = useUser()
+   // console.log(props)
+   useEffect(() => {
+      // console.log(isMobile)
+      if (isMobile) {
+         setOpen(false)
+         return
+      }
+      setOpen(true)
+   }, [isMobile])
 
    const handleDrawerOpen = () => {
       setOpen(!open)
    }
 
-   const handleDrawerClose = () => {
-      setOpen(false)
-   }
-
    return (
       <div className={classes.root}>
+         <CssBaseline />
          <AppBar position='fixed' className={classes.appBar}>
             <Toolbar>
                <IconButton
@@ -130,14 +148,15 @@ const Layout = props => {
          </AppBar>
          <Drawer
             className={classes.drawer}
-            variant='persistent'
+            variant={!isMobile ? 'persistent' : 'temporary'}
             anchor='left'
             open={open}
+            onClose={() => setOpen(false)}
             classes={{
                paper: classes.drawerPaper
             }}
          >
-            <div className={classes.toolbar} />
+            {!isMobile && <div className={classes.toolbar} />}
             <List>
                <ListItem className={classes.avatar}>
                   <ListItemAvatar>
@@ -148,7 +167,7 @@ const Layout = props => {
                <Divider />
                <ListItem className={classes.links} component={Link} to='/'>
                   <ListItemIcon>
-                     <Mail />
+                     <AirlineSeatIndividualSuite />
                   </ListItemIcon>
                   <ListItemText primary={'Leitos'} />
                </ListItem>
@@ -158,24 +177,51 @@ const Layout = props => {
                   to='/patients'
                >
                   <ListItemIcon>
-                     <Mail />
+                     <Group />
                   </ListItemIcon>
                   <ListItemText primary={'Pacientes'} />
                </ListItemLink>
                <ListItemLink
                   className={classes.links}
                   component={Link}
-                  to='/nas'
                   to={{
                      pathname: '/nas',
                      state: { resetFilter: true }
                   }}
                >
                   <ListItemIcon>
-                     <Mail />
+                     <ListIcon />
                   </ListItemIcon>
                   <ListItemText primary={'NAS'} />
                </ListItemLink>
+               {user.role === 'ADMIN' && (
+                  <React.Fragment>
+                     <ListItemLink
+                        className={classes.links}
+                        component={Link}
+                        to={{
+                           pathname: '/invite-users'
+                        }}
+                     >
+                        <ListItemIcon>
+                           <SupervisedUserCircle />
+                        </ListItemIcon>
+                        <ListItemText primary={'Adicionar usuários'} />
+                     </ListItemLink>
+                     <ListItemLink
+                        className={classes.links}
+                        component={Link}
+                        to={{
+                           pathname: '/cms'
+                        }}
+                     >
+                        <ListItemIcon>
+                           <Settings />
+                        </ListItemIcon>
+                        <ListItemText primary={'Gerenciar conteúdo'} />
+                     </ListItemLink>
+                  </React.Fragment>
+               )}
             </List>
          </Drawer>
          <main
@@ -184,7 +230,7 @@ const Layout = props => {
                [classes.contentShift]: open
             })}
          >
-            <Container maxWidth='lg'>
+            <Container maxWidth='lg' disableGutters={isMobile}>
                <div className={classes.toolbar} />
                <Box mt={2}>{props.children}</Box>
             </Container>

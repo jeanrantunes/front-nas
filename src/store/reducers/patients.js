@@ -1,8 +1,10 @@
+import { rankingPatientsNas } from '../../utils/nas-func'
+
 const INITIAL_STATE = {
    data: [],
    metadata: null,
    filter: null,
-   loading: false,
+   loading: true,
    error: false
 }
 
@@ -21,15 +23,34 @@ export default function patients(state = INITIAL_STATE, action) {
             loading: true
          }
       case 'SUCCESS_PATIENT':
+         const formatNas = action.payload.data.map(p => {
+            if (!p.latest_nas) {
+               return p
+            }
+            if (
+               new Date(p.latest_nas.nas_date).toLocaleDateString() ===
+               new Date().toLocaleDateString()
+            ) {
+               p.daily_nas = true
+               return p
+            }
+            return p
+         })
+
          return {
-            data: action.payload.data,
+            data: rankingPatientsNas(formatNas),
             metadata: action.payload.metadata,
             loading: false,
             error: false,
             filter: action.payload.filter || null
          }
       case 'FAILURE_PATIENT':
-         return { ...state, loading: false, error: true, filter: null }
+         return {
+            ...state,
+            loading: false,
+            error: true,
+            filter: null
+         }
       default:
          return state
    }

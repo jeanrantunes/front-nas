@@ -24,7 +24,6 @@ const AuthProvider = props => {
    const [requestItsFinished, setRequestItsFinished] = useState(false)
    const {
       data = { user: null },
-      error,
       isSettled,
       isPending,
       isRejected,
@@ -43,8 +42,6 @@ const AuthProvider = props => {
       if (isPending) {
          return <Loader />
       } else if (isRejected) {
-         // console.log('redirect login')
-         // console.log(error)
          return <h2>redirect login</h2>
       }
    }
@@ -58,8 +55,9 @@ const AuthProvider = props => {
          window.location.href = '/'
          return { user }
       } catch (err) {
+         // console.log(err)
          clearToken()
-         return err
+         return Promise.reject(err)
       }
    }
 
@@ -75,6 +73,18 @@ const AuthProvider = props => {
       }
    }
 
+   const updateUser = async data => {
+      const { id, token, ...rest } = data
+      setToken(token)
+      try {
+         const { data: user } = await api.put(`v1/users/${id}`, rest)
+         return { user }
+      } catch (err) {
+         clearToken()
+         return err
+      }
+   }
+
    const logout = () => {
       clearToken()
       reload()
@@ -83,7 +93,7 @@ const AuthProvider = props => {
 
    return (
       <AuthContext.Provider
-         value={{ login, logout, signup, data }}
+         value={{ login, logout, signup, updateUser, data }}
          {...props}
       />
    )

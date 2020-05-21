@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { FormControl, InputLabel, MenuItem } from '@material-ui/core'
+import {
+   FormControl,
+   InputLabel,
+   MenuItem,
+   FormHelperText
+} from '@material-ui/core'
 import { Field } from 'formik'
-import { Select, TextField } from 'formik-material-ui'
+import { Select } from 'formik-material-ui'
 
 import api from '../../services/api'
 
@@ -10,11 +15,11 @@ const CustomSelect = props => {
       id,
       endpoint,
       options,
-      name,
-      label,
       variant,
       classes,
-      multiple
+      error,
+      helperText,
+      ...rest
    } = props
    const [data, setData] = useState(null)
 
@@ -26,7 +31,7 @@ const CustomSelect = props => {
          async function get() {
             try {
                const { data } = await api.get(endpoint)
-               setData(data)
+               setData(data.data)
             } catch (error) {
                setData(null)
             }
@@ -39,16 +44,19 @@ const CustomSelect = props => {
    return (
       <React.Fragment>
          {data && (
-            <FormControl fullWidth variant={variant} className={classes}>
-               <InputLabel id={`${id}-label`}>{label}</InputLabel>
+            <FormControl
+               fullWidth
+               variant={variant}
+               className={classes}
+               error={error}
+               required={rest.required || false}
+            >
+               <InputLabel id={`${rest.id}-label`}>{rest.label}</InputLabel>
                <Field
-                  id={id}
-                  labelId={`${id}-label`}
+                  {...rest}
+                  labelId={`${rest.id}-label`}
                   component={Select}
                   type='text'
-                  multiple={multiple}
-                  name={name}
-                  label={label}
                >
                   {data.map(d => (
                      <MenuItem key={d.id} value={d.id}>
@@ -56,6 +64,7 @@ const CustomSelect = props => {
                      </MenuItem>
                   ))}
                </Field>
+               {error && <FormHelperText>{helperText}</FormHelperText>}
             </FormControl>
          )}
       </React.Fragment>

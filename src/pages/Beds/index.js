@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
-   CssBaseline,
    Grid,
    Avatar,
    Card,
@@ -24,21 +23,24 @@ import {
    Popover,
    Radio,
    RadioGroup,
-   FormControlLabel
+   FormControlLabel,
+   useMediaQuery
 } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import { Add, MoreVert, Assignment, Ballot } from '@material-ui/icons'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
+import { red, orange, cyan, lime } from '@material-ui/core/colors'
+import { Add, MoreVert, Assignment, Ballot, Cake } from '@material-ui/icons'
+import Skeleton from '@material-ui/lab/Skeleton'
 
 import {
    requestPatients,
-   addPatient,
    updatePatient,
    removePatient
 } from '../../store/actions/patients'
-import { age } from '../../helpers/date'
+import { age, isItBirthday } from '../../helpers/date'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
 import AnimatedBadge from '../../components/AnimatedBadge'
+import { dailyAveragePatientsNas } from '../../utils/nas-func'
 
 const TransitionDialog = React.forwardRef(function Transition(props, ref) {
    return <Slide direction='up' ref={ref} {...props} />
@@ -62,6 +64,13 @@ const useStyles = makeStyles(theme => ({
    },
    buttonOutcome: {
       marginTop: theme.spacing(1)
+   },
+   cardActions: {
+      display: 'flex',
+      alignItems: 'center'
+   },
+   scaleBadge: {
+      width: 17
    }
 }))
 
@@ -85,7 +94,7 @@ const MenuPatient = props => {
          <MenuItem component={Link} to={`/patient/${patient.id}`}>
             Editar dados
          </MenuItem>
-         <MenuItem component={Link} to={`/nas?patientId=${patient.id}`}>
+         <MenuItem component={Link} to={`/nas?patient_id=${patient.id}`}>
             Histórico NAS
          </MenuItem>
          <MenuItem onClick={deletePatient}>Excluir</MenuItem>
@@ -101,23 +110,24 @@ const PopoverPatient = props => {
    function handleSubmitOutcome(event) {
       event.preventDefault()
       let comorbidities = [],
-         hospitalizationReason = []
+         hospitalization_reason = []
       if (patient.comorbidities) {
          comorbidities = patient.comorbidities.map(c => c.id)
       }
-      if (patient.hospitalizationReason) {
-         hospitalizationReason = patient.hospitalizationReason.map(h => h.id)
+      if (patient.hospitalization_reason) {
+         hospitalization_reason = patient.hospitalization_reason.map(h => h.id)
       }
 
-      const outcomeDate = new Date()
-
+      const outcome_date = new Date()
+      delete patient.nas
+      delete patient.average
       dispatch(
          updatePatient({
             ...patient,
             outcome,
-            outcomeDate,
+            outcome_date,
             comorbidities,
-            hospitalizationReason
+            hospitalization_reason
          })
       )
       setShow(false)
@@ -126,7 +136,6 @@ const PopoverPatient = props => {
    return (
       <Popover open={show} anchorEl={anchor} onClose={close}>
          <form className={classes.formOutcome} onSubmit={handleSubmitOutcome}>
-            {patient.name}
             <RadioGroup
                aria-label='outcome'
                name='outcome'
@@ -187,10 +196,74 @@ const WarningDialog = props => {
    )
 }
 
+const SkeletonCards = () => {
+   const classes = useStyles()
+   const array = []
+   for (let i = 0; i < 6; i++) {
+      array.push(
+         <Grid key={i} item xs={12} md={6} lg={4}>
+            <Card className={classes.card}>
+               <CardHeader
+                  avatar={
+                     <Skeleton
+                        animation='wave'
+                        variant='circle'
+                        width={40}
+                        height={40}
+                     />
+                  }
+                  title={
+                     <Skeleton
+                        animation='wave'
+                        height={20}
+                        width='60%'
+                        style={{ marginBottom: 6 }}
+                     />
+                  }
+                  subheader={
+                     <Skeleton
+                        animation='wave'
+                        height={20}
+                        width='30%'
+                        style={{ marginBottom: 6 }}
+                     />
+                  }
+               />
+               <CardContent className={classes.cardContent}>
+                  <Skeleton
+                     animation='wave'
+                     height={20}
+                     width='20%'
+                     style={{ marginBottom: 3 }}
+                  />
+                  <Skeleton
+                     animation='wave'
+                     height={20}
+                     width='100%'
+                     style={{ marginBottom: 3 }}
+                  />
+                  <Skeleton
+                     animation='wave'
+                     height={20}
+                     width='100%'
+                     style={{ marginBottom: 3 }}
+                  />
+               </CardContent>
+               <CardActions className={classes.buttonsCard}>
+                  <Skeleton animation='wave' height={35} width={155} />
+                  <Skeleton animation='wave' height={35} width={120} />
+               </CardActions>
+            </Card>
+         </Grid>
+      )
+   }
+   return <React.Fragment>{array}</React.Fragment>
+}
+
 const DoesShowDot = ({ flag, children }) => {
    if (!flag) {
       return (
-         <AnimatedBadge vertical='top' horizontal='left' color='warning'>
+         <AnimatedBadge vertical='top' horizontal='left' color={lime[500]}>
             {children}
          </AnimatedBadge>
       )
@@ -199,10 +272,12 @@ const DoesShowDot = ({ flag, children }) => {
 }
 
 const Beds = props => {
-   const { data: patients } = useSelector(store => store.patients)
+   const patients = useSelector(store => store.patients)
    const classes = useStyles()
    const dispatch = useDispatch()
    const [patient, setPatient] = useState(null)
+   const theme = useTheme()
+   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
    const [anchorEl, setAnchorEl] = useState(null)
    const [anchorPopover, setAnchorPopover] = useState(null)
@@ -222,7 +297,7 @@ const Beds = props => {
    }
 
    function handleClickAddPatient() {
-      if (patients.length >= 6) {
+      if (patients.data.length >= 6) {
          setWarningDialog(true)
          return
       }
@@ -233,21 +308,30 @@ const Beds = props => {
       setAnchorPopover(event.currentTarget)
    }
 
+   function hasNas() {
+      return patients.data.find(patient => {
+         if (patient.latest_nas) {
+            return patient
+         }
+         return null
+      })
+   }
+
    useEffect(() => {
       dispatch(
          requestPatients({
             outcome: 'pending',
-            orderBy: 'bed',
-            itemsPerPage: 6,
+            order_by: 'bed',
+            items_per_page: 6,
             comorbidities: true,
-            hospitalizationReason: true
+            hospitalization_reason: true,
+            latest_nas: true
          })
       )
    }, [dispatch])
 
    return (
       <Layout>
-         <CssBaseline />
          {anchorEl && patient && (
             <MenuPatient
                anchor={anchorEl}
@@ -265,117 +349,218 @@ const Beds = props => {
                dispatch={dispatch}
             />
          )}
+
          <Grid container component='main' spacing={2}>
-            {patients ? (
-               patients.map(patient => (
-                  <React.Fragment key={patient.id}>
-                     {patient.outcome === 'pending' && (
-                        <Grid item xs={12} sm={6} md={4}>
-                           <Card className={classes.card}>
-                              <CardHeader
-                                 avatar={
-                                    <Avatar aria-label='recipe'>
-                                       {patient.bed}
-                                    </Avatar>
-                                 }
-                                 action={
-                                    <IconButton
-                                       aria-controls='simple-menu'
-                                       aria-haspopup='true'
-                                       onClick={e => handleClick(e, patient)}
-                                    >
-                                       <MoreVert />
-                                    </IconButton>
-                                 }
-                                 title={patient.name}
-                                 subheader={
-                                    patient.birthday &&
-                                    `${age(patient.birthday)} anos`
-                                 }
-                              />
-                              <CardContent className={classes.cardContent}>
-                                 {patient.comorbidities && (
-                                    <Typography
-                                       variant='body2'
-                                       color='textSecondary'
-                                       component='p'
-                                    >
-                                       {patient.comorbidities.length > 1 ? (
-                                          <b>Comorbidades:</b>
-                                       ) : (
-                                          <b>Comorbidade:</b>
-                                       )}{' '}
-                                       {patient.comorbidities.map(
-                                          (c, index) => (
-                                             <span key={index}>
-                                                {c.name}
-                                                {index !==
-                                                patient.comorbidities.length - 1
-                                                   ? ', '
-                                                   : '.'}
-                                             </span>
-                                          )
+            {patients.loading ? (
+               <React.Fragment>
+                  <Grid item xs={12}>
+                     <Skeleton
+                        animation='wave'
+                        variant='rect'
+                        height={32}
+                        className={classes.card}
+                     />
+                  </Grid>
+
+                  <SkeletonCards />
+               </React.Fragment>
+            ) : !patients.loading && !!patients.data.length ? (
+               <React.Fragment>
+                  <Grid item xs={12} sm={6}>
+                     {hasNas(patients.data) && (
+                        <Typography variant='h5' gutterBottom>
+                           Média diária:{' '}
+                           {dailyAveragePatientsNas(patients.data).toFixed(1)}
+                        </Typography>
+                     )}
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                     <Typography align='right' variant='body2' gutterBottom>
+                        Escala de gravidade:{' '}
+                        <AnimatedBadge
+                           className={classes.scaleBadge}
+                           vertical='bottom'
+                           horizontal='right'
+                           color={red[500]}
+                        >
+                           {' '}
+                        </AnimatedBadge>
+                        <AnimatedBadge
+                           className={classes.scaleBadge}
+                           vertical='bottom'
+                           horizontal='right'
+                           color={orange[600]}
+                        >
+                           {' '}
+                        </AnimatedBadge>
+                        <AnimatedBadge
+                           className={classes.scaleBadge}
+                           vertical='bottom'
+                           horizontal='right'
+                           color={cyan[500]}
+                        >
+                           {' '}
+                        </AnimatedBadge>
+                     </Typography>
+                     <Typography align='right' variant='body2' gutterBottom>
+                        Cadastrar NAS diário:{' '}
+                        <AnimatedBadge
+                           className={classes.scaleBadge}
+                           vertical='bottom'
+                           horizontal='right'
+                           color={lime[500]}
+                        >
+                           {' '}
+                        </AnimatedBadge>
+                     </Typography>
+                  </Grid>
+                  {patients.data.map(patient => (
+                     <React.Fragment key={patient.id}>
+                        {patient.outcome === 'pending' && (
+                           <Grid item xs={12} md={6} lg={4}>
+                              <Card className={classes.card}>
+                                 <CardHeader
+                                    avatar={
+                                       <React.Fragment>
+                                          <Avatar aria-label='recipe'>
+                                             {patient.bed}
+                                          </Avatar>
+                                       </React.Fragment>
+                                    }
+                                    action={
+                                       <div className={classes.cardActions}>
+                                          {isItBirthday(patient.birthday) && (
+                                             <Cake color='secondary' />
+                                          )}
+                                          <IconButton
+                                             aria-controls='simple-menu'
+                                             aria-haspopup='true'
+                                             onClick={e =>
+                                                handleClick(e, patient)
+                                             }
+                                          >
+                                             <MoreVert />
+                                          </IconButton>
+                                       </div>
+                                    }
+                                    title={patient.name}
+                                    subheader={
+                                       patient.birthday &&
+                                       `${age(patient.birthday)} anos`
+                                    }
+                                 />
+                                 <CardContent className={classes.cardContent}>
+                                    {patient.average > 0 && (
+                                       <Typography
+                                          variant='body2'
+                                          color='textSecondary'
+                                          component='p'
+                                          style={{
+                                             color:
+                                                patient.color ||
+                                                'rgba(0, 0, 0, 0.54)'
+                                          }}
+                                       >
+                                          <b>NAS:</b>{' '}
+                                          {patient.average.toFixed(1)}
+                                          <br />
+                                       </Typography>
+                                    )}
+                                    {patient.comorbidities &&
+                                       !!patient.comorbidities.length && (
+                                          <Typography
+                                             variant='body2'
+                                             color='textSecondary'
+                                             component='p'
+                                          >
+                                             {patient.comorbidities.length >
+                                             1 ? (
+                                                <b>Comorbidades:</b>
+                                             ) : (
+                                                <b>Comorbidade:</b>
+                                             )}{' '}
+                                             {patient.comorbidities.map(
+                                                (c, index) => (
+                                                   <span key={index}>
+                                                      {c.name}
+                                                      {index !==
+                                                      patient.comorbidities
+                                                         .length -
+                                                         1
+                                                         ? ', '
+                                                         : '.'}
+                                                   </span>
+                                                )
+                                             )}
+                                          </Typography>
                                        )}
-                                    </Typography>
-                                 )}
-                                 {patient.hospitalizationReason && (
-                                    <Typography
-                                       variant='body2'
-                                       color='textSecondary'
-                                       component='p'
-                                    >
-                                       {patient.hospitalizationReason.length >
-                                       1 ? (
-                                          <b>Motivos da internação:</b>
-                                       ) : (
-                                          <b>Motivo da internação:</b>
-                                       )}{' '}
-                                       {patient.hospitalizationReason.map(
-                                          (h, index) => (
-                                             <span key={index}>
-                                                {h.name}
-                                                {index !==
-                                                patient.hospitalizationReason
-                                                   .length -
-                                                   1
-                                                   ? ', '
-                                                   : '.'}
-                                             </span>
-                                          )
+                                    {patient.hospitalization_reason &&
+                                       !!patient.hospitalization_reason
+                                          .length && (
+                                          <Typography
+                                             variant='body2'
+                                             color='textSecondary'
+                                             component='p'
+                                          >
+                                             {patient.hospitalization_reason
+                                                .length > 1 ? (
+                                                <b>Motivos da internação:</b>
+                                             ) : (
+                                                <b>Motivo da internação:</b>
+                                             )}{' '}
+                                             {patient.hospitalization_reason.map(
+                                                (h, index) => (
+                                                   <span key={index}>
+                                                      {h.name}
+                                                      {index !==
+                                                      patient
+                                                         .hospitalization_reason
+                                                         .length -
+                                                         1
+                                                         ? ', '
+                                                         : '.'}
+                                                   </span>
+                                                )
+                                             )}
+                                          </Typography>
                                        )}
-                                    </Typography>
-                                 )}
-                              </CardContent>
-                              <CardActions className={classes.buttonsCard}>
-                                 <DoesShowDot flag={patient.dailyNas}>
+                                 </CardContent>
+                                 <CardActions className={classes.buttonsCard}>
+                                    <DoesShowDot flag={patient.daily_nas}>
+                                       <Button
+                                          variant='outlined'
+                                          size='small'
+                                          color='primary'
+                                          startIcon={<Assignment />}
+                                          to={`/nas/${patient.id}`}
+                                          component={Link}
+                                          disabled={patient.daily_nas}
+                                       >
+                                          {isMobile
+                                             ? 'Reg. NAS'
+                                             : 'Registrar NAS'}
+                                       </Button>
+                                    </DoesShowDot>
+
                                     <Button
                                        variant='outlined'
                                        size='small'
                                        color='primary'
-                                       startIcon={<Assignment />}
-                                       to={`/nas/${patient.id}`}
-                                       component={Link}
-                                       disabled={patient.dailyNas}
+                                       onClick={e =>
+                                          handleClickOucome(e, patient)
+                                       }
+                                       startIcon={<Ballot />}
                                     >
-                                       Registrar NAS
+                                       Desfecho
                                     </Button>
-                                 </DoesShowDot>
-
-                                 <Button
-                                    variant='outlined'
-                                    size='small'
-                                    color='primary'
-                                    onClick={e => handleClickOucome(e, patient)}
-                                    startIcon={<Ballot />}
-                                 >
-                                    Desfecho
-                                 </Button>
-                              </CardActions>
-                           </Card>
-                        </Grid>
-                     )}
-                  </React.Fragment>
-               ))
+                                 </CardActions>
+                              </Card>
+                           </Grid>
+                        )}
+                     </React.Fragment>
+                  ))}
+               </React.Fragment>
             ) : (
                <Typography variant='h5' component='span'>
                   Não há pacientes cadastrados! Adicione um paciente clicando em
@@ -383,6 +568,7 @@ const Beds = props => {
                </Typography>
             )}
          </Grid>
+
          <Fab
             className={classes.fab}
             color='primary'

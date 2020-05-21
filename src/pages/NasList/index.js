@@ -11,16 +11,16 @@ import {
    IconButton,
    Divider,
    TextField,
-   CircularProgress,
    InputAdornment,
    Menu,
    MenuItem,
    Typography,
    ListItemIcon,
-   Avatar
+   Avatar,
+   useMediaQuery
 } from '@material-ui/core'
-import { Pagination } from '@material-ui/lab'
-import { makeStyles } from '@material-ui/core/styles'
+import { Pagination, Skeleton } from '@material-ui/lab'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import {
    Delete,
    FilterList,
@@ -35,7 +35,6 @@ import api from '../../services/api'
 
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
-import NasDialog from '../../containers/DialogLateNas'
 import { setQueryStringWithoutPageReload } from '../../helpers/queryString'
 import useQueryString from '../../hooks/useQueryString'
 import { formatPTDateTime } from '../../helpers/date'
@@ -96,35 +95,170 @@ const useStyles = makeStyles(theme => ({
    }
 }))
 
+const SkeletonList = () => {
+   const classes = useStyles()
+   const array = []
+   for (let i = 0; i < 10; i++) {
+      array.push(
+         <React.Fragment key={i}>
+            {i !== 0 && <Divider />}
+            <ListItem className={classes.listItem} dense button>
+               <ListItemIcon>
+                  <Skeleton
+                     animation='wave'
+                     variant='circle'
+                     width={40}
+                     height={40}
+                  />
+               </ListItemIcon>
+               <Grid item xs={7} sm={10} md={12}>
+                  <ListItemText
+                     primary={
+                        <Skeleton
+                           animation='wave'
+                           height={20}
+                           width='60%'
+                           style={{ marginBottom: 6 }}
+                        />
+                     }
+                     secondary={
+                        <Skeleton
+                           animation='wave'
+                           height={20}
+                           width='30%'
+                           style={{ marginBottom: 6 }}
+                        />
+                     }
+                  />
+               </Grid>
+            </ListItem>
+         </React.Fragment>
+      )
+   }
+   return <List className={classes.list}>{array}</List>
+}
+
 const Nas = props => {
+   const theme = useTheme()
+   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
    const nas = useSelector(store => store.nas)
-   const patients = useSelector(store => store.patients)
    const stateLocation = props.location.state
    const [nasId, setNasId] = useState(null)
-   const [page, setPage] = useQueryString('page')
+   const [page, setPage] = useQueryString('page', 0)
    const [name, setName] = useQueryString('name')
    const [labelName, setLabelName] = useState()
    const [firstTime, setFirstTime] = useState(true)
 
    const [idNas, setIdNas] = useQueryString('id')
-   const [patientId, setPatientId] = useQueryString('patientId')
-   const [createdStartDate, setCreatedStartDate] = useQueryString(
-      'createdStartDate'
+   const [patient_id, setPatientId] = useQueryString('patient_id')
+   const [created_start_date, setCreatedStartDate] = useQueryString(
+      'created_start_date'
    )
    const nameInputRef = useRef(null)
    const idInputRef = useRef(null)
    const dateInputRef = useRef(null)
-   const [createdEndDate, setCreatedEndDate] = useQueryString('createdEndDate')
+   const [created_end_date, setCreatedEndDate] = useQueryString(
+      'created_end_date'
+   )
    const [sortedBy, setSortedBy] = useState(1)
    const [anchorEl, setAnchorEl] = React.useState(null)
    const [disabledName, setDisabledName] = useState(false)
-
    const openMenuOrder = Boolean(anchorEl)
 
    const dispatch = useDispatch()
    const classes = useStyles()
    const [deleteDialog, setDeleteDialog] = useState(false)
-   const itemsPerPage = 8
+   const items_per_page = 8
+
+   function cleanFilters() {
+      setLabelName(null)
+      setPage(0)
+      setName(null)
+      setIdNas(null)
+      setCreatedEndDate(null)
+      setCreatedStartDate(null)
+      setDisabledName(false)
+      setPatientId(null)
+      setSortedBy(1)
+      setQueryStringWithoutPageReload('')
+      props.location.search = ''
+      idInputRef.current.value = ''
+      nameInputRef.current.value = ''
+      dateInputRef.current.value = ''
+   }
+
+   useEffect(() => {
+      if (stateLocation && stateLocation.resetFilter) {
+         stateLocation.resetFilter = false
+         setLabelName(null)
+         setPage(0)
+         setName(null)
+         setIdNas(null)
+         setCreatedEndDate(null)
+         setCreatedStartDate(null)
+         setDisabledName(false)
+         setPatientId(null)
+         setSortedBy(1)
+         setQueryStringWithoutPageReload('')
+         props.location.search = ''
+         idInputRef.current.value = ''
+         nameInputRef.current.value = ''
+         dateInputRef.current.value = ''
+      }
+   }, [
+      stateLocation,
+      props.location.search,
+      setCreatedEndDate,
+      setCreatedStartDate,
+      setIdNas,
+      setName,
+      setPage,
+      setPatientId
+   ])
+
+   useEffect(() => {
+      async function getPatient() {
+         try {
+            const { data } = await api.get(`v1/patients/${patient_id}`)
+            setLabelName(data.name)
+         } catch {
+            setLabelName(null)
+         }
+      }
+
+      if (patient_id && firstTime) {
+         setFirstTime(false)
+         setDisabledName(true)
+         getPatient()
+         return
+      } else if (!patient_id) {
+         setDisabledName(false)
+      }
+
+      dispatch(
+         requestNas({
+            items_per_page,
+            page,
+            id: idNas || null,
+            name: name || null,
+            patient_id: patient_id || null,
+            created_start_date,
+            created_end_date,
+            order_by: options.find(o => o.id === sortedBy).field,
+            order_type: options.find(o => o.id === sortedBy).order
+         })
+      )
+   }, [
+      dispatch,
+      page,
+      name,
+      patient_id,
+      created_start_date,
+      created_end_date,
+      idNas,
+      sortedBy,
+      firstTime
+   ])
 
    const handleInputName = debounce(name => {
       setPage(0)
@@ -154,83 +288,11 @@ const Nas = props => {
       setPage(page - 1)
    }
 
-   async function getPatient() {
-      try {
-         const { data } = await api.get(`v1/patients/${patientId}`)
-         setLabelName(data.name)
-      } catch {
-         setLabelName(null)
-      }
-   }
-
-   function cleanFilters() {
-      setLabelName(null)
-      setPage(0)
-      setName(null)
-      setIdNas(null)
-      setCreatedEndDate(null)
-      setCreatedStartDate(null)
-      setDisabledName(false)
-      setPatientId(null)
-      setSortedBy(1)
-      setQueryStringWithoutPageReload('')
-      props.location.search = ''
-      idInputRef.current.value = ''
-      nameInputRef.current.value = ''
-      dateInputRef.current.value = ''
-   }
-
-   useEffect(() => {
-      if (stateLocation && stateLocation.resetFilter) {
-         stateLocation.resetFilter = false
-         cleanFilters()
-         return
-      }
-      if (patientId && firstTime) {
-         setFirstTime(false)
-         setDisabledName(true)
-         if (!patients.data.length) {
-            getPatient()
-         } else {
-            const { data } = patients
-            const p = data.find(p => p.id === patientId)
-            if (p.name) {
-               setLabelName(p.name)
-            }
-         }
-      } else if (!patientId) {
-         setDisabledName(false)
-      }
-      dispatch(
-         requestNas({
-            itemsPerPage,
-            page,
-            id: idNas || null,
-            name: name || null,
-            patientId: patientId || null,
-            createdStartDate,
-            createdEndDate,
-            orderBy: options.find(o => o.id === sortedBy).field,
-            orderType: options.find(o => o.id === sortedBy).order
-         })
-      )
-   }, [
-      dispatch,
-      page,
-      name,
-      patientId,
-      createdStartDate,
-      createdEndDate,
-      idNas,
-      sortedBy,
-      stateLocation
-   ])
-
    return (
       <Layout>
          <Paper elevation={1} className={classes.filter}>
             <Grid container component='main' spacing={2}>
-               <Grid item xs={12} sm={3}>
+               <Grid item xs={12} sm={6} lg={3}>
                   <TextField
                      id='id-nas'
                      label='Código nas'
@@ -245,12 +307,14 @@ const Nas = props => {
                         )
                      }}
                      fullWidth
+                     disabled={nas.loading}
                   />
                </Grid>
-               <Grid item xs={12} sm={4}>
+               <Grid item xs={12} sm={6} lg={4}>
                   <TextField
                      id='name'
                      label='Nome do paciente'
+                     autoComplete='off'
                      variant='outlined'
                      defaultValue={name}
                      inputRef={nameInputRef}
@@ -268,25 +332,29 @@ const Nas = props => {
                              }
                            : {})
                      }}
+                     disabled={nas.loading}
                   />
                </Grid>
-               <Grid item xs={11} sm={4}>
+               <Grid item xs={12} sm={6} lg={4}>
                   <DateRange
-                     startDate={createdStartDate}
-                     endDate={createdEndDate}
+                     startDate={created_start_date}
+                     endDate={created_end_date}
                      id='created-range'
                      label='Data de criação'
                      setStartDate={setCreatedStartDate}
                      setEndDate={setCreatedEndDate}
                      inputRef={dateInputRef}
+                     disabled={nas.loading}
                   />
                </Grid>
                <Grid
                   item
-                  xs={1}
+                  xs={12}
+                  sm={6}
+                  lg={1}
                   container
                   direction='row'
-                  justify='center'
+                  justify={isMobile ? 'flex-end' : 'center'}
                   alignItems='center'
                   className={classes.filterButtons}
                >
@@ -304,6 +372,7 @@ const Nas = props => {
                      keepMounted
                      open={openMenuOrder}
                      onClose={() => setAnchorEl(null)}
+                     disabled={nas.loading}
                   >
                      {options.map(option => (
                         <MenuItem
@@ -328,12 +397,10 @@ const Nas = props => {
          </Paper>
          <Paper elevation={2} className={classes.items}>
             {nas.loading ? (
-               <div className={classes.containerLoading}>
-                  <CircularProgress />
-               </div>
+               <SkeletonList />
             ) : (
                <List className={classes.list}>
-                  {nas.data ? (
+                  {nas.data && nas.data.length ? (
                      nas.data.map((nas, index) => {
                         const labelId = `checkbox-list-label-${nas.id}`
                         return (
@@ -354,13 +421,15 @@ const Nas = props => {
                                        </Avatar>
                                     </ListItemIcon>
                                  )}
-                                 <ListItemText
-                                    id={labelId}
-                                    primary={`N${nas.id}`}
-                                    secondary={`${
-                                       nas.patient.name
-                                    } - ${formatPTDateTime(nas.nasDate)}`}
-                                 />
+                                 <Grid item xs={7} sm={10} md={12}>
+                                    <ListItemText
+                                       id={labelId}
+                                       primary={`N${nas.id}`}
+                                       secondary={`${
+                                          nas.patient.name
+                                       } - ${formatPTDateTime(nas.nas_date)}`}
+                                    />
+                                 </Grid>
                                  <ListItemSecondaryAction>
                                     <IconButton
                                        edge='end'
@@ -386,11 +455,11 @@ const Nas = props => {
                </List>
             )}
          </Paper>
-         {nas.metadata && nas.metadata.total > itemsPerPage && (
+         {nas.metadata && nas.metadata.total > items_per_page && (
             <div className={classes.pagination}>
                <Pagination
                   count={Math.ceil(
-                     nas.metadata.total / nas.metadata.itemsPerPage
+                     nas.metadata.total / nas.metadata.items_per_page
                   )}
                   size='large'
                   onChange={handlePagination}
@@ -407,7 +476,6 @@ const Nas = props => {
                funcRemove={removeNas}
             />
          )}
-         <NasDialog typeButton='fab' />
       </Layout>
    )
 }

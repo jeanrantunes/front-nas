@@ -8,7 +8,7 @@ import {
    CardActions
 } from '@material-ui/core'
 import { DateRange } from 'react-date-range'
-import { makeStyles, withStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import pt from 'date-fns/locale/pt-BR'
 
 import 'react-date-range/dist/styles.css'
@@ -41,7 +41,8 @@ const MaterialDateRange = ({
    maxDate,
    setStartDate,
    setEndDate,
-   inputRef
+   inputRef,
+   disabled
 }) => {
    const classes = useStyles()
    const [preDate, setPreDate] = useState([null, null])
@@ -102,9 +103,12 @@ const MaterialDateRange = ({
       }
 
       setInputValue(`${start} até ${end}`)
-   }, [startDate, endDate])
+   }, [startDate, endDate, inputRef])
 
    function open(e) {
+      if (disabled) {
+         return
+      }
       e.preventDefault()
       e.target.blur()
       setShow(true)
@@ -149,6 +153,7 @@ const MaterialDateRange = ({
             onClick={open}
             value={inputValue}
             inputRef={inputRef}
+            disabled={disabled}
             fullWidth
          />
          <Backdrop className={classes.backdrop} open={show}>
