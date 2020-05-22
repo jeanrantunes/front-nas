@@ -41,7 +41,8 @@
       "eject": "react-scripts eject",
       "commit": "git-cz",
       "prettier": "prettier --write '**/*.js' --ignore-path .gitignore",
-      "eslint": "eslint --ignore-path .gitignore ."
+      "eslint": "eslint --ignore-path .gitignore .",
+      "heroku-postbuild": "yarn build"
    },
    "eslintConfig": {
       "extends": "react-app"
@@ -75,5 +76,6 @@
          "prettier --write",
          "git add"
       ]
-   }
+   },
+   "heroku-run-build-script": true
 }
