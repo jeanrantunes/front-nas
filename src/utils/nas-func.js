@@ -127,13 +127,13 @@ export const rankingPatientsNas = patients => {
       return a.average > b.average ? -1 : a.average < b.average ? 1 : 0
    })
 
-   if (patientsWithAverage[0].average) {
+   if (patientsWithAverage[0] && patientsWithAverage[0].average) {
       patientsWithAverage[0].color = red[500]
    }
-   if (patientsWithAverage[1].average) {
+   if (patientsWithAverage[1] && patientsWithAverage[1].average) {
       patientsWithAverage[1].color = orange[600]
    }
-   if (patientsWithAverage[2].average) {
+   if (patientsWithAverage[2] && patientsWithAverage[2].average) {
       patientsWithAverage[2].color = cyan[500]
    }
 

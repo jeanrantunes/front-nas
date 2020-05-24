@@ -36,7 +36,6 @@ export default function patients(state = INITIAL_STATE, action) {
             }
             return p
          })
-
          return {
             data: rankingPatientsNas(formatNas),
             metadata: action.payload.metadata,
