@@ -18,11 +18,17 @@ import {
    Select,
    MenuItem,
    Menu,
+   Typography,
    useMediaQuery
 } from '@material-ui/core'
 import { Pagination, Skeleton } from '@material-ui/lab'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
-import { Delete, FilterList, Close } from '@material-ui/icons'
+import {
+   Delete,
+   FilterList,
+   Close,
+   SentimentDissatisfied
+} from '@material-ui/icons'
 import DateRange from '../../components/MaterialDateRange'
 import { debounce } from 'lodash-es'
 import { formatPTDateTime } from '../../helpers/date'
@@ -76,6 +82,12 @@ const useStyles = makeStyles(theme => ({
    },
    filterButtons: {
       flexFlow: 'row'
+   },
+   info: {
+      padding: theme.spacing(5),
+      alignItems: 'center',
+      display: 'flex',
+      justifyContent: 'center'
    }
 }))
 
@@ -354,67 +366,77 @@ const Patients = () => {
                <SkeletonList />
             ) : (
                <List className={classes.list}>
-                  {patients.data.map((patient, index) => {
-                     const labelId = `checkbox-list-label-${patient.id}`
-                     return (
-                        <React.Fragment key={patient.id}>
-                           {index !== 0 && <Divider />}
+                  {patients.data && patients.data.length ? (
+                     patients.data.map((patient, index) => {
+                        const labelId = `checkbox-list-label-${patient.id}`
+                        return (
+                           <React.Fragment key={patient.id}>
+                              {index !== 0 && <Divider />}
 
-                           <ListItem
-                              to={`/patient/${patient.id}`}
-                              component={Link}
-                              className={classes.listItem}
-                              dense
-                              button
-                           >
-                              <ListItemIcon>
-                                 {patient.outcome === 'pending' ? (
-                                    <AnimatedBadge
-                                       vertical='bottom'
-                                       horizontal='right'
-                                       color='#76ff03'
-                                       overlap='circle'
-                                    >
+                              <ListItem
+                                 to={`/patient/${patient.id}`}
+                                 component={Link}
+                                 className={classes.listItem}
+                                 dense
+                                 button
+                              >
+                                 <ListItemIcon>
+                                    {patient.outcome === 'pending' ? (
+                                       <AnimatedBadge
+                                          vertical='bottom'
+                                          horizontal='right'
+                                          color='#76ff03'
+                                          overlap='circle'
+                                       >
+                                          <Avatar>{patient.bed}</Avatar>
+                                       </AnimatedBadge>
+                                    ) : (
                                        <Avatar>{patient.bed}</Avatar>
-                                    </AnimatedBadge>
-                                 ) : (
-                                    <Avatar>{patient.bed}</Avatar>
-                                 )}
-                              </ListItemIcon>
-                              <Grid item xs={7} sm={10} md={12}>
-                                 <ListItemText
-                                    id={labelId}
-                                    primary={patient.name}
-                                    secondary={
-                                       `Data da internação: ${formatPTDateTime(
-                                          patient.hospitalization_date
-                                       )}`
-                                       // patient.outcomeDate
-                                       //    && `Desfecho: ${
-                                       //         patient.outcome
-                                       //      } - ${new Date(
-                                       //         patient.outcomeDate
-                                       //      ).toUTCString()}`
-                                       //    : patient.hospitalizationDate &&
-                                       //      `Entrada: ${new Date(
-                                       //         patient.hospitalizationDate
-                                       //      ).toUTCString()}`
-                                    }
-                                 />
-                              </Grid>
-                              <ListItemSecondaryAction>
-                                 <IconButton
-                                    edge='end'
-                                    aria-label='delete'
-                                    onClick={() => deletePatient(patient.id)}
-                                 >
-                                    <Delete />
-                                 </IconButton>
-                              </ListItemSecondaryAction>
-                           </ListItem>
-                        </React.Fragment>
-                     )
-                  })}
+                                    )}
+                                 </ListItemIcon>
+                                 <Grid item xs={7} sm={10} md={12}>
+                                    <ListItemText
+                                       id={labelId}
+                                       primary={patient.name}
+                                       secondary={
+                                          `Data da internação: ${formatPTDateTime(
+                                             patient.hospitalization_date
+                                          )}`
+                                          // patient.outcomeDate
+                                          //    && `Desfecho: ${
+                                          //         patient.outcome
+                                          //      } - ${new Date(
+                                          //         patient.outcomeDate
+                                          //      ).toUTCString()}`
+                                          //    : patient.hospitalizationDate &&
+                                          //      `Entrada: ${new Date(
+                                          //         patient.hospitalizationDate
+                                          //      ).toUTCString()}`
+                                       }
+                                    />
+                                 </Grid>
+                                 <ListItemSecondaryAction>
+                                    <IconButton
+                                       edge='end'
+                                       aria-label='delete'
+                                       onClick={() => deletePatient(patient.id)}
+                                    >
+                                       <Delete />
+                                    </IconButton>
+                                 </ListItemSecondaryAction>
+                              </ListItem>
+                           </React.Fragment>
+                        )
+                     })
+                  ) : (
+                     <Typography
+                        className={classes.info}
+                        variant='subtitle1'
+                        align='center'
+                     >
+                        Não há registros... <SentimentDissatisfied />
+                     </Typography>
+                  )}
                </List>
             )}
          </Paper>

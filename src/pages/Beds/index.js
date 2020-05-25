@@ -467,6 +467,34 @@ const Beds = props => {
                                           <br />
                                        </Typography>
                                     )}
+                                    {patient.origin && (
+                                       <Typography
+                                          variant='body2'
+                                          color='textSecondary'
+                                          component='p'
+                                       >
+                                          <b>Procedência:</b>{' '}
+                                          {(function () {
+                                             switch (patient.origin) {
+                                                case 'ps':
+                                                   return 'Pronto Socorro (PS)'
+                                                case 'nursery':
+                                                   return 'Enfermaria'
+                                                case 'surgical-ward':
+                                                   return 'Bloco Cirúrgico'
+                                                case 'other-institution':
+                                                   return 'Outra instituição'
+                                                case 'uti-covid':
+                                                   return 'UTI Covid'
+                                                case 'home':
+                                                   return 'Casa'
+                                                default:
+                                                   break
+                                             }
+                                          })()}
+                                          <br />
+                                       </Typography>
+                                    )}
                                     {patient.comorbidities &&
                                        !!patient.comorbidities.length && (
                                           <Typography

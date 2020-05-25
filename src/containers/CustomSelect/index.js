@@ -3,10 +3,11 @@ import {
    FormControl,
    InputLabel,
    MenuItem,
-   FormHelperText
+   FormHelperText,
+   Select
 } from '@material-ui/core'
-import { Field } from 'formik'
-import { Select } from 'formik-material-ui'
+import { FastField } from 'formik'
+// import { Select } from 'formik-material-ui'
 
 import api from '../../services/api'
 
@@ -19,9 +20,13 @@ const CustomSelect = props => {
       classes,
       error,
       helperText,
+      value,
       ...rest
    } = props
    const [data, setData] = useState(null)
+   const [selected, setSelected] = useState(
+      value ? value : rest.multiple ? [] : options[0].id
+   )
 
    useEffect(() => {
       if (!endpoint && !options) {
@@ -52,18 +57,32 @@ const CustomSelect = props => {
                required={rest.required || false}
             >
                <InputLabel id={`${rest.id}-label`}>{rest.label}</InputLabel>
-               <Field
-                  {...rest}
+               <FastField
                   labelId={`${rest.id}-label`}
-                  component={Select}
+                  component={({ handleChange, field }) => {
+                     return (
+                        <Select
+                           {...rest}
+                           value={selected}
+                           onChange={e => {
+                              field.onChange(e)
+                              handleChange(e)
+                           }}
+                           onBlur={e => {
+                              field.onBlur(e)
+                           }}
+                        >
+                           {data.map(d => (
+                              <MenuItem key={d.id} value={d.id}>
+                                 {d.name}
+                              </MenuItem>
+                           ))}
+                        </Select>
+                     )
+                  }}
                   type='text'
-               >
-                  {data.map(d => (
-                     <MenuItem key={d.id} value={d.id}>
-                        {d.name}
-                     </MenuItem>
-                  ))}
-               </Field>
+                  handleChange={event => setSelected(event.target.value)}
+               ></FastField>
                {error && <FormHelperText>{helperText}</FormHelperText>}
             </FormControl>
          )}

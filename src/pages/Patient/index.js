@@ -115,10 +115,9 @@ const Patient = props => {
       async function getPatient() {
          try {
             const { data } = await api.get(`v1/patients/${id}`)
-            console.log(data)
+
             setPatient(data)
          } catch (error) {
-            console.log(error)
             setPatient(null)
          }
       }
@@ -144,7 +143,8 @@ const Patient = props => {
                         patient.comorbidities.map(c => c.id)) ||
                      [],
                   saps_3: patient.saps_3 || 0,
-                  outcome: patient.outcome === 'pending' ? '' : patient.outcome,
+                  outcome: patient.outcome,
+                  origin: patient.origin || 'ps',
                   outcome_time: patient.outcome_date || new Date(),
                   outcome_date: patient.outcome_date || new Date(),
                   bed: patient.bed || 'A'
@@ -221,7 +221,7 @@ const Patient = props => {
                            locale={pt}
                         >
                            <Grid container spacing={2}>
-                              <Grid item xs={12} sm={6}>
+                              <Grid item xs={12} sm={4}>
                                  <FormControl fullWidth>
                                     <Field
                                        component={TextField}
@@ -233,7 +233,7 @@ const Patient = props => {
                                     />
                                  </FormControl>
                               </Grid>
-                              <Grid item xs={12} sm={6}>
+                              <Grid item xs={12} sm={4}>
                                  <FormControl variant='outlined' fullWidth>
                                     <Field
                                        component={DatePicker}
@@ -244,6 +244,32 @@ const Patient = props => {
                                        maxDate={new Date()}
                                     />
                                  </FormControl>
+                              </Grid>
+                              <Grid item xs={12} sm={4}>
+                                 <CustomSelect
+                                    options={[
+                                       {
+                                          id: 'ps',
+                                          name: 'Pronto Socorro (PS)'
+                                       },
+                                       { id: 'nursery', name: 'Enfermaria' },
+                                       {
+                                          id: 'surgical-ward',
+                                          name: 'Bloco Cirúrgico'
+                                       },
+                                       {
+                                          id: 'other-institution',
+                                          name: 'Outra instituição'
+                                       },
+                                       { id: 'uti-covid', name: 'UTI Covid' },
+                                       { id: 'home', name: 'Casa' }
+                                    ]}
+                                    label='Procedência'
+                                    name='origin'
+                                    variant='outlined'
+                                    id='origin'
+                                    value={values.origin}
+                                 />
                               </Grid>
                               <Grid item xs={12} sm={3}>
                                  <FormControl variant='outlined' fullWidth>
@@ -281,6 +307,7 @@ const Patient = props => {
                                     name='bed'
                                     variant='outlined'
                                     id='bed'
+                                    value={values.bed}
                                  />
                               </Grid>
                               <Grid item xs={12} sm={3}>
@@ -310,6 +337,7 @@ const Patient = props => {
                                     variant='outlined'
                                     id='comorbidities'
                                     multiple
+                                    value={values.comorbidities}
                                  />
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -320,21 +348,24 @@ const Patient = props => {
                                     variant='outlined'
                                     id='hospitalization_reason'
                                     multiple
+                                    value={values.hospitalization_reason}
                                  />
                               </Grid>
                               <Grid item xs={12} sm={6} md={4}>
                                  <CustomSelect
                                     options={[
-                                       { id: '', name: 'Nenhum' },
+                                       { id: 'pending', name: 'Internado' },
                                        { id: 'discharge', name: 'Alta' },
-                                       { id: 'death', name: 'Morte' }
+                                       { id: 'death', name: 'Óbito' }
                                     ]}
                                     label='Desfecho'
                                     name='outcome'
                                     variant='outlined'
                                     id='outcome'
+                                    value={values.outcome}
                                  />
                               </Grid>
+
                               <Grid item xs={12} sm={6} md={4}>
                                  <FormControl variant='outlined' fullWidth>
                                     <Field
@@ -342,7 +373,10 @@ const Patient = props => {
                                        inputVariant='outlined'
                                        name='outcome_date'
                                        label='Data do desfecho'
-                                       disabled={!values.outcome}
+                                       disabled={
+                                          !values.outcome ||
+                                          values.outcome === 'pending'
+                                       }
                                        format='dd/MM/yyyy'
                                        maxDate={new Date()}
                                     />
@@ -355,7 +389,10 @@ const Patient = props => {
                                        inputVariant='outlined'
                                        name='outcome_time'
                                        label='Hora do desfecho'
-                                       disabled={!values.outcome}
+                                       disabled={
+                                          !values.outcome ||
+                                          values.outcome === 'pending'
+                                       }
                                     />
                                  </FormControl>
                               </Grid>
