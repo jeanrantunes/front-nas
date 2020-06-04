@@ -121,6 +121,7 @@ const PopoverPatient = props => {
       const outcome_date = new Date()
       delete patient.nas
       delete patient.average
+      delete patient.latest_nas
       dispatch(
          updatePatient({
             ...patient,
