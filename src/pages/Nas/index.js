@@ -128,7 +128,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Sinais vitais horários, cálculo e registro regular do balanço hídrico (registro de ingesta/ excreta)'
+                     label='1a) Sinais vitais horários, cálculo e registro regular do balanço hídrico (registro de ingesta/ excreta)'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -136,7 +136,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Presença à beira do leito e observação ou atividade contínua por 2 horas ou mais em algum plantão por razões de segurança, gravidade ou terapia, tais como: ventilação mecânica não-invasiva, desmame, agitação, confusão mental, posição prona, procedimentos de doação de órgãos, preparo e administração de fluídos ou medicação, auxílio em procedimentos específicos.'
+                     label='1b) Presença à beira do leito e observação ou atividade contínua por 2 horas ou mais em algum plantão por razões de segurança, gravidade ou terapia, tais como: ventilação mecânica não-invasiva, desmame, agitação, confusão mental, posição prona, procedimentos de doação de órgãos, preparo e administração de fluídos ou medicação, auxílio em procedimentos específicos.'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -144,7 +144,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Presença à beira do leito e observação ou atividade contínua por 4 horas ou mais, em algum plantão por razões de segurança, gravidade ou terapia.'
+                     label='1c) Presença à beira do leito e observação ou atividade contínua por 4 horas ou mais, em algum plantão por razões de segurança, gravidade ou terapia.'
                      className={classes.controlradio}
                   />
                </RadioGroup>
@@ -220,7 +220,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização de procedimentos de higiene tais como: curativo de feridas e cateteres intravasculares, troca de roupa de cama, higiene coeporal do paciente em situações especiais (incontinência, vômito, queimaduras, feridas com secreção, curativos cirúrgicos complexos com irrigação), procedimentos especiais (ex. isolamento), etc.'
+                     label='4a) Realização de procedimentos de higiene tais como: curativo de feridas e cateteres intravasculares, troca de roupa de cama, higiene coeporal do paciente em situações especiais (incontinência, vômito, queimaduras, feridas com secreção, curativos cirúrgicos complexos com irrigação), procedimentos especiais (ex. isolamento), etc.'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -228,7 +228,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização de procedimentos de higiene que durem mais que 2 horas em algum plantão.'
+                     label='4b) Realização de procedimentos de higiene que durem mais que 2 horas em algum plantão.'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -236,7 +236,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização de procedimentos de higiene que duem mais do que 4 horas, em algum plantão.'
+                     label='4c) Realização de procedimentos de higiene que duem mais do que 4 horas, em algum plantão.'
                      className={classes.controlradio}
                   />
                </RadioGroup>
@@ -292,7 +292,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização do(s) procedimento(s) de mobilização e posicionamento até 3 vezes em 24 horas.'
+                     label='6a) Realização do(s) procedimento(s) de mobilização e posicionamento até 3 vezes em 24 horas.'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -300,7 +300,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização do(s) procedimento(s) mais do que 3 vezes em 24 horas ou com 2 enfermeiros em qualquer frequência.'
+                     label='6b) Realização do(s) procedimento(s) mais do que 3 vezes em 24 horas ou com 2 enfermeiros em qualquer frequência.'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -308,7 +308,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização do(s) procedimento(s) com 3 ou mais enfermeiros em qualquer ferquência.'
+                     label='6c) Realização do(s) procedimento(s) com 3 ou mais enfermeiros em qualquer ferquência.'
                      className={classes.controlradio}
                   />
                </RadioGroup>
@@ -338,7 +338,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Suporte e cuidado aos familiares e pacientes que requerem dedicação exclusiva por cerca de uma hora em algum plantão, tais como: explicar consições clínica, lidar com a dor e angústia, lidar com circunstâncias familiares difíceis.'
+                     label='7a) Suporte e cuidado aos familiares e pacientes que requerem dedicação exclusiva por cerca de uma hora em algum plantão, tais como: explicar consições clínica, lidar com a dor e angústia, lidar com circunstâncias familiares difíceis.'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -346,7 +346,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Suporte e cuidado aos familiares que requerem dedicação exclusiva por 3 horas ou mais em algum plantão, tais como: circunstâncias trabalhosas (ex. grande número de familiares, problemas de linguagem, familiares hostis).'
+                     label='7b) Suporte e cuidado aos familiares que requerem dedicação exclusiva por 3 horas ou mais em algum plantão, tais como: circunstâncias trabalhosas (ex. grande número de familiares, problemas de linguagem, familiares hostis).'
                      className={classes.controlradio}
                   />
                </RadioGroup>
@@ -367,7 +367,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização de tarefas administrativas e gerenciais de rotina, tais como: processamento de dados clínicos, solicitação de exames, troca de informações profissionais (por ex. passagem de plantão, visitas clínicas).'
+                     label='8a) Realização de tarefas administrativas e gerenciais de rotina, tais como: processamento de dados clínicos, solicitação de exames, troca de informações profissionais (por ex. passagem de plantão, visitas clínicas).'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -375,7 +375,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização de tarefas administrativas e gerenciais que requerem dedicação integral por cerca de 2 horas em algum plantão, tais como: atividades de pesquisa, aplicação de protocolos, procedimentos de admissão e alta).'
+                     label='8b) Realização de tarefas administrativas e gerenciais que requerem dedicação integral por cerca de 2 horas em algum plantão, tais como: atividades de pesquisa, aplicação de protocolos, procedimentos de admissão e alta).'
                      className={classes.controlradio}
                   />
                   <FormControlLabel
@@ -383,7 +383,7 @@ function getStepContent(step, classes, values, handleChange) {
                      control={
                         <Radio className={classes.radio} color='primary' />
                      }
-                     label='Realização de tarefas administrativas e gerenciais que requerem dedicação integral por cerca de 4 horas ou mais de tempo em algum plantão.'
+                     label='8c) Realização de tarefas administrativas e gerenciais que requerem dedicação integral por cerca de 4 horas ou mais de tempo em algum plantão.'
                      className={classes.controlradio}
                   />
                </RadioGroup>
@@ -883,7 +883,7 @@ const Nas = props => {
 
    const { id } = props.match.params
 
-   const [nas, setNas] = useState(null)
+   const [nas, setNas] = useState(undefined)
    const [openAll, setOpenAll] = useState(false)
    const [loading, setLoading] = useState(false)
    const [success, setSuccess] = useState(false)
@@ -941,197 +941,250 @@ const Nas = props => {
             </Grid>
             <Grid item xs={12}>
                {nas && (
-                  <Formik
-                     initialValues={{
-                        monitoring_and_controls:
-                           nas.monitoring_and_controls || '1a',
-                        laboratory_investigations:
-                           nas.laboratory_investigations || false,
-                        medication_except_vasoactive_drugs:
-                           nas.medication_except_vasoactive_drugs || true,
-                        hygiene_procedures: nas.hygiene_procedures || '4a',
-                        caring_for_drains: nas.caring_for_drains || true,
-                        mobilization_and_positioning:
-                           nas.mobilization_and_positioning || '6b',
-                        support_and_care: nas.support_and_care || '7a',
-                        administrative_and_managerial_tasks:
-                           nas.administrative_and_managerial_tasks || '8b',
-                        ventilatory_support: nas.ventilatory_support || false,
-                        lung_function: nas.lung_function || true,
-                        artificial_airways: nas.artificial_airways || true,
-                        vasoactive_drugs: nas.vasoactive_drugs || false,
-                        intravenous_replacement:
-                           nas.intravenous_replacement || true,
-                        monitoring_of_the_left_atrium:
-                           nas.monitoring_of_the_left_atrium || true,
-                        cardiorespiratory_resumption:
-                           nas.cardiorespiratory_resumption || false,
-                        hemofiltration_techniques:
-                           nas.hemofiltration_techniques || false,
-                        urine_output: nas.urine_output || false,
-                        intracranial_pressure:
-                           nas.intracranial_pressure || false,
-                        acidosis_treatment: nas.acidosis_treatment || false,
-                        intravenous_hyperalimentation:
-                           nas.intravenous_hyperalimentation || false,
-                        enteral_feeding: nas.enteral_feeding || true,
-                        specific_interventions_in_the_unit:
-                           nas.specific_interventions_in_the_unit || false,
-                        specific_interventions_outside_the_unit:
-                           nas.specific_interventions_outside_the_unit || false,
-                        nas_date: getQueryStringValue('nas_date')
-                           ? new Date(getQueryStringValue('nas_date'))
-                           : new Date()
-                     }}
-                     onSubmit={async (values, { setSubmitting }) => {
-                        setLoading(true)
-                        setSuccess(false)
-                        try {
-                           if (isEmpty(nas)) {
-                              await api.post('v1/nas', {
-                                 ...values,
-                                 patient_id: id
-                              })
-                           } else {
-                              delete values.nas_date
-                              await api.put(`v1/nas/${id}`, {
-                                 ...values,
-                                 patient_id: nas.patient_id
-                              })
-                           }
-
-                           setLoading(false)
-                           setSuccess(true)
-                           setError(false)
-
-                           setTimeout(() => {
-                              props.history.goBack()
-                              setSuccess(false)
-                           }, timeSnack)
-                        } catch (err) {
-                           setLoading(false)
+                  <React.Fragment>
+                     <Formik
+                        initialValues={{
+                           monitoring_and_controls:
+                              nas.monitoring_and_controls || '1a',
+                           laboratory_investigations: isNaN(
+                              nas.laboratory_investigations
+                           )
+                              ? false
+                              : nas.laboratory_investigations,
+                           medication_except_vasoactive_drugs: isNaN(
+                              nas.medication_except_vasoactive_drugs
+                           )
+                              ? true
+                              : nas.medication_except_vasoactive_drugs,
+                           hygiene_procedures: nas.hygiene_procedures || '4a',
+                           caring_for_drains: isNaN(nas.caring_for_drains)
+                              ? true
+                              : nas.caring_for_drains,
+                           mobilization_and_positioning:
+                              nas.mobilization_and_positioning || '6b',
+                           support_and_care: nas.support_and_care || '7a',
+                           administrative_and_managerial_tasks:
+                              nas.administrative_and_managerial_tasks || '8b',
+                           ventilatory_support: isNaN(nas.ventilatory_support)
+                              ? false
+                              : nas.ventilatory_support,
+                           lung_function: isNaN(nas.lung_function)
+                              ? true
+                              : nas.lung_function,
+                           artificial_airways: isNaN(nas.artificial_airways)
+                              ? true
+                              : nas.artificial_airways,
+                           vasoactive_drugs: isNaN(nas.vasoactive_drugs)
+                              ? false
+                              : nas.vasoactive_drugs,
+                           intravenous_replacement: isNaN(
+                              nas.intravenous_replacement
+                           )
+                              ? true
+                              : false,
+                           monitoring_of_the_left_atrium: isNaN(
+                              nas.monitoring_of_the_left_atrium
+                           )
+                              ? true
+                              : nas.monitoring_of_the_left_atrium,
+                           cardiorespiratory_resumption: isNaN(
+                              nas.cardiorespiratory_resumption
+                           )
+                              ? false
+                              : nas.cardiorespiratory_resumption,
+                           hemofiltration_techniques: isNaN(
+                              nas.hemofiltration_techniques
+                           )
+                              ? false
+                              : nas.hemofiltration_techniques,
+                           urine_output: isNaN(nas.urine_output)
+                              ? false
+                              : nas.urine_output,
+                           intracranial_pressure: isNaN(
+                              nas.intracranial_pressure
+                           )
+                              ? false
+                              : nas.intracranial_pressure,
+                           acidosis_treatment: isNaN(nas.acidosis_treatment)
+                              ? false
+                              : nas.acidosis_treatment,
+                           intravenous_hyperalimentation: isNaN(
+                              nas.intravenous_hyperalimentation
+                           )
+                              ? false
+                              : nas.intravenous_hyperalimentation,
+                           enteral_feeding: isNaN(nas.enteral_feeding)
+                              ? true
+                              : nas.enteral_feeding,
+                           specific_interventions_in_the_unit: isNaN(
+                              nas.specific_interventions_in_the_unit
+                           )
+                              ? false
+                              : nas.specific_interventions_in_the_unit,
+                           specific_interventions_outside_the_unit: isNaN(
+                              nas.specific_interventions_outside_the_unit
+                           )
+                              ? false
+                              : nas.specific_interventions_outside_the_unit,
+                           nas_date: getQueryStringValue('nas_date')
+                              ? new Date(getQueryStringValue('nas_date'))
+                              : new Date()
+                        }}
+                        onSubmit={async (values, { setSubmitting }) => {
+                           setLoading(true)
                            setSuccess(false)
-                           setError(false)
-                           setTimeout(() => {
+                           try {
+                              if (isEmpty(nas)) {
+                                 await api.post('v1/nas', {
+                                    ...values,
+                                    patient_id: id
+                                 })
+                              } else {
+                                 delete values.nas_date
+                                 await api.put(`v1/nas/${id}`, {
+                                    ...values,
+                                    patient_id: nas.patient_id
+                                 })
+                              }
+
+                              setLoading(false)
+                              setSuccess(true)
                               setError(false)
-                           }, timeSnack)
-                        }
-                     }}
-                  >
-                     {props => {
-                        const {
-                           values,
 
-                           handleChange,
+                              setTimeout(() => {
+                                 props.history.goBack()
+                                 setSuccess(false)
+                              }, timeSnack)
+                           } catch (err) {
+                              setLoading(false)
+                              setSuccess(false)
+                              setError(false)
+                              setTimeout(() => {
+                                 setError(false)
+                              }, timeSnack)
+                           }
+                        }}
+                     >
+                        {/* {!nas.enteral_feeding && 'asdasdas'} */}
+                        {props => {
+                           const {
+                              values,
 
-                           handleSubmit
-                        } = props
-                        return (
-                           <form
-                              className={classes.form}
-                              onSubmit={e => {
-                                 e.preventDefault()
-                                 handleSubmit()
-                              }}
-                              noValidate
-                           >
-                              <Stepper
-                                 activeStep={activeStep}
-                                 orientation='vertical'
-                                 className={classes.stepper}
+                              handleChange,
+
+                              handleSubmit
+                           } = props
+                           return (
+                              <form
+                                 className={classes.form}
+                                 onSubmit={e => {
+                                    e.preventDefault()
+                                    handleSubmit()
+                                 }}
+                                 noValidate
                               >
-                                 {steps.map((label, index) => (
-                                    <Step key={label} expanded={openAll}>
-                                       <StepLabel>{label}</StepLabel>
-                                       <StepContent
-                                          className={classes.stepperContent}
-                                       >
-                                          {getStepContent(
-                                             index,
-                                             classes,
-                                             values,
-                                             handleChange
-                                          )}
-
-                                          <div
-                                             className={classes.actionsSteper}
-                                          >
-                                             {!openAll && (
-                                                <React.Fragment>
-                                                   <Button
-                                                      disabled={
-                                                         activeStep === 0
-                                                      }
-                                                      onClick={handleBack}
-                                                      className={classes.button}
-                                                      size='small'
-                                                   >
-                                                      Voltar
-                                                   </Button>
-                                                   {activeStep ===
-                                                   steps.length - 1 ? (
-                                                      <ButtonLoading
-                                                         variant='contained'
-                                                         color='primary'
-                                                         type='submit'
-                                                         loading={loading}
-                                                         success={success}
-                                                         wrapperClass={
-                                                            classes.wrapperLoading
-                                                         }
-                                                         className={
-                                                            classes.button
-                                                         }
-                                                      >
-                                                         Salvar
-                                                      </ButtonLoading>
-                                                   ) : (
-                                                      <Button
-                                                         variant='contained'
-                                                         color='primary'
-                                                         size='small'
-                                                         onClick={handleNext}
-                                                         className={
-                                                            classes.button
-                                                         }
-                                                      >
-                                                         Próximo
-                                                      </Button>
-                                                   )}
-                                                </React.Fragment>
-                                             )}
-                                          </div>
-                                       </StepContent>
-                                    </Step>
-                                 ))}
-                              </Stepper>
-                              {openAll && (
-                                 <ButtonLoading
-                                    variant='contained'
-                                    color='primary'
-                                    type='submit'
-                                    loading={loading}
-                                    success={success}
-                                    wrapperClass={classes.wrapperLoading}
-                                    className={classes.buttonSubmit}
+                                 <Stepper
+                                    activeStep={activeStep}
+                                    orientation='vertical'
+                                    className={classes.stepper}
                                  >
-                                    Salvar
-                                 </ButtonLoading>
-                              )}
-                              <Snackbar open={success}>
-                                 <Alert variant='filled' severity='success'>
-                                    Salvo com sucesso :D
-                                 </Alert>
-                              </Snackbar>
-                              <Snackbar open={error}>
-                                 <Alert variant='filled' severity='error'>
-                                    Algo deu errado :(
-                                 </Alert>
-                              </Snackbar>
-                           </form>
-                        )
-                     }}
-                  </Formik>
+                                    {steps.map((label, index) => (
+                                       <Step key={label} expanded={openAll}>
+                                          <StepLabel>{label}</StepLabel>
+                                          <StepContent
+                                             className={classes.stepperContent}
+                                          >
+                                             {getStepContent(
+                                                index,
+                                                classes,
+                                                values,
+                                                handleChange
+                                             )}
+
+                                             <div
+                                                className={
+                                                   classes.actionsSteper
+                                                }
+                                             >
+                                                {!openAll && (
+                                                   <React.Fragment>
+                                                      <Button
+                                                         disabled={
+                                                            activeStep === 0
+                                                         }
+                                                         onClick={handleBack}
+                                                         className={
+                                                            classes.button
+                                                         }
+                                                         size='small'
+                                                      >
+                                                         Voltar
+                                                      </Button>
+                                                      {activeStep ===
+                                                      steps.length - 1 ? (
+                                                         <ButtonLoading
+                                                            variant='contained'
+                                                            color='primary'
+                                                            type='submit'
+                                                            loading={loading}
+                                                            success={success}
+                                                            wrapperClass={
+                                                               classes.wrapperLoading
+                                                            }
+                                                            className={
+                                                               classes.button
+                                                            }
+                                                         >
+                                                            Salvar
+                                                         </ButtonLoading>
+                                                      ) : (
+                                                         <Button
+                                                            variant='contained'
+                                                            color='primary'
+                                                            size='small'
+                                                            onClick={handleNext}
+                                                            className={
+                                                               classes.button
+                                                            }
+                                                         >
+                                                            Próximo
+                                                         </Button>
+                                                      )}
+                                                   </React.Fragment>
+                                                )}
+                                             </div>
+                                          </StepContent>
+                                       </Step>
+                                    ))}
+                                 </Stepper>
+                                 {openAll && (
+                                    <ButtonLoading
+                                       variant='contained'
+                                       color='primary'
+                                       type='submit'
+                                       loading={loading}
+                                       success={success}
+                                       wrapperClass={classes.wrapperLoading}
+                                       className={classes.buttonSubmit}
+                                    >
+                                       Salvar
+                                    </ButtonLoading>
+                                 )}
+                                 <Snackbar open={success}>
+                                    <Alert variant='filled' severity='success'>
+                                       Salvo com sucesso :D
+                                    </Alert>
+                                 </Snackbar>
+                                 <Snackbar open={error}>
+                                    <Alert variant='filled' severity='error'>
+                                       Algo deu errado :(
+                                    </Alert>
+                                 </Snackbar>
+                              </form>
+                           )
+                        }}
+                     </Formik>
+                  </React.Fragment>
                )}
             </Grid>
          </Grid>

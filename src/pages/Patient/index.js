@@ -160,10 +160,23 @@ const Patient = props => {
                         outcome_time,
                         outcome_date,
                         outcome,
-                        ...rest
+                        birthday,
+                        comorbidities,
+                        hospitalization_reason,
+                        name,
+                        origin,
+                        saps_3,
+                        bed
                      } = values
+
                      const data = {
-                        ...rest,
+                        birthday,
+                        comorbidities,
+                        hospitalization_reason,
+                        name,
+                        origin,
+                        saps_3,
+                        bed,
                         outcome: outcome || 'pending',
                         hospitalization_date: combineDateAndTime(
                            hospitalization_date,
@@ -329,8 +342,10 @@ const Patient = props => {
                                     />
                                  </FormControl>
                               </Grid>
-                              <Grid item xs={12} sm={6}>
+                              <Grid item xs={12}>
                                  <CustomSelect
+                                    autocompleteselect
+                                    placeholder='Comorbidade'
                                     endpoint='/v1/comorbidities'
                                     label='Comormidades'
                                     name='comorbidities'
@@ -340,8 +355,10 @@ const Patient = props => {
                                     value={values.comorbidities}
                                  />
                               </Grid>
-                              <Grid item xs={12} sm={6}>
+                              <Grid item xs={12}>
                                  <CustomSelect
+                                    autocompleteselect
+                                    placeholder='Motivo'
                                     endpoint='/v1/hospitalization-reason'
                                     label='Motivos da internação'
                                     name='hospitalization_reason'

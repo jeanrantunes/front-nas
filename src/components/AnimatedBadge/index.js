@@ -25,8 +25,8 @@ const AnimatedBadge = ({
             borderRadius: '50%',
             '&::after': {
                position: 'absolute',
-               top: overlap === 'circle' ? -1 : 0,
-               left: overlap === 'circle' ? -1 : 0,
+               top: 0,
+               left: 0,
                width: '100%',
                height: '100%',
                borderRadius: '50%',
