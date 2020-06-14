@@ -7,10 +7,24 @@ export function* getNasList({ payload: { filter } }) {
       const {
          data: { data: nas, metadata }
       } = yield call(api.get, 'v1/nas', { params: filter })
+
+      if (!nas || !nas.length) {
+         yield put({
+            type: 'SUCCESS_NAS',
+            payload: {
+               data: [],
+               metadata,
+               filter
+            }
+         })
+         return
+      }
+
       const nasWithAverage = nas.map(n => ({
          ...n,
          average: calcClassification(n)
       }))
+
       yield put({
          type: 'SUCCESS_NAS',
          payload: {
