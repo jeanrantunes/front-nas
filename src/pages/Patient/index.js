@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+
 import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
 import {
@@ -18,6 +20,7 @@ import { TimePicker, DatePicker } from 'formik-material-ui-pickers'
 import DateFnsUtils from '@date-io/date-fns'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { Link } from 'react-router-dom'
+import { enableButtonHelp } from '../../store/actions/stepByStep'
 
 import Layout from '../../Layouts/dashboard'
 import NasDialog from '../../containers/DialogLateNas'
@@ -96,6 +99,7 @@ const PatientSchema = Yup.object().shape({
 
 const Patient = props => {
    const classes = useStyles()
+   const dispatch = useDispatch()
    const theme = useTheme()
    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -110,11 +114,13 @@ const Patient = props => {
    useEffect(() => {
       if (!id) {
          setPatient({})
+         dispatch(enableButtonHelp())
          return
       }
       async function getPatient() {
          try {
             const { data } = await api.get(`v1/patients/${id}`)
+            dispatch(enableButtonHelp())
 
             setPatient(data)
          } catch (error) {
@@ -122,9 +128,84 @@ const Patient = props => {
          }
       }
       getPatient()
-   }, [id])
+   }, [id, dispatch])
    return (
-      <Layout>
+      <Layout
+         {...props}
+         steps={[
+            {
+               element: '.patient-name',
+               intro: 'Nome do paciente'
+            },
+            {
+               element: '.patient-birthday',
+               intro: 'Data de nascimento do paciente'
+            },
+            {
+               element: '.patient-origin',
+               intro: 'Procedência do paciente'
+            },
+            {
+               element: '.patient-hospitalization',
+               intro: 'Data da internação do paciente'
+            },
+            {
+               element: '.patient-hospitalization-time',
+               intro: 'Hora da internação do paciente'
+            },
+            {
+               element: '.patient-bed',
+               intro: 'Leito do paciente'
+            },
+            {
+               element: '.patient-saps',
+               intro: 'SAPS 3 do paciente'
+            },
+            {
+               element: '.patient-comorbidities',
+               intro:
+                  'Comorbidades do paciente. Obs: Se for necessário adicionar uma nova comorbidade, acesse a página Gerenciador de conteúdo.'
+            },
+            {
+               element: '.patient-hospitalization-reason',
+               intro:
+                  'Motivos de internação do paciente. Obs: Se for necessário adicionar um novo motivo de internação, acesse a página Gerenciador de conteúdo.'
+            },
+            {
+               element: '.patient-outcome',
+               intro: 'Desfecho do paciente'
+            },
+            {
+               element: '.patient-outcome-date',
+               intro:
+                  'Data do desfecho. Obs: Caso não seja preenchido será considerado a data de hoje.'
+            },
+            {
+               element: '.patient-outcome-time',
+               intro:
+                  'Hora do desfecho. Obs: Caso não seja preenchido será considerado a hora atual.'
+            },
+
+            id
+               ? {
+                    element: '.patient-history-nas',
+                    intro:
+                       'Lista de todos os NAS cadastrados deste paciente desde a sua internação.'
+                 }
+               : null,
+            id
+               ? {
+                    element: '.patient-late-nas',
+                    intro: 'Permite o cadastro de NAS atrasado'
+                 }
+               : null,
+
+            {
+               element: '.save-button',
+               intro: 'Salva as modificações'
+            }
+         ]}
+      >
          {patient && (
             <Formik
                initialValues={{
@@ -235,7 +316,10 @@ const Patient = props => {
                         >
                            <Grid container spacing={2}>
                               <Grid item xs={12} sm={4}>
-                                 <FormControl fullWidth>
+                                 <FormControl
+                                    fullWidth
+                                    className='patient-name'
+                                 >
                                     <Field
                                        component={TextField}
                                        variant='outlined'
@@ -247,7 +331,11 @@ const Patient = props => {
                                  </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={4}>
-                                 <FormControl variant='outlined' fullWidth>
+                                 <FormControl
+                                    variant='outlined'
+                                    fullWidth
+                                    className='patient-birthday'
+                                 >
                                     <Field
                                        component={DatePicker}
                                        inputVariant='outlined'
@@ -282,10 +370,15 @@ const Patient = props => {
                                     variant='outlined'
                                     id='origin'
                                     value={values.origin}
+                                    className='patient-origin'
                                  />
                               </Grid>
                               <Grid item xs={12} sm={3}>
-                                 <FormControl variant='outlined' fullWidth>
+                                 <FormControl
+                                    variant='outlined'
+                                    fullWidth
+                                    className='patient-hospitalization'
+                                 >
                                     <Field
                                        component={DatePicker}
                                        inputVariant='outlined'
@@ -297,7 +390,11 @@ const Patient = props => {
                                  </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={3}>
-                                 <FormControl variant='outlined' fullWidth>
+                                 <FormControl
+                                    variant='outlined'
+                                    fullWidth
+                                    className='patient-hospitalization-time'
+                                 >
                                     <Field
                                        component={TimePicker}
                                        inputVariant='outlined'
@@ -308,6 +405,7 @@ const Patient = props => {
                               </Grid>
                               <Grid item xs={12} sm={3}>
                                  <CustomSelect
+                                    className='patient-bed'
                                     options={[
                                        { id: 'A', name: 'A' },
                                        { id: 'B', name: 'B' },
@@ -324,7 +422,10 @@ const Patient = props => {
                                  />
                               </Grid>
                               <Grid item xs={12} sm={3}>
-                                 <FormControl fullWidth>
+                                 <FormControl
+                                    fullWidth
+                                    className='patient-saps'
+                                 >
                                     <TextFieldMeterial
                                        id='saps_3'
                                        label='SAPS 3'
@@ -344,6 +445,7 @@ const Patient = props => {
                               </Grid>
                               <Grid item xs={12}>
                                  <CustomSelect
+                                    className='patient-comorbidities'
                                     autocompleteselect
                                     placeholder='Comorbidade'
                                     endpoint='/v1/comorbidities'
@@ -357,6 +459,7 @@ const Patient = props => {
                               </Grid>
                               <Grid item xs={12}>
                                  <CustomSelect
+                                    className='patient-hospitalization-reason'
                                     autocompleteselect
                                     placeholder='Motivo'
                                     endpoint='/v1/hospitalization-reason'
@@ -370,6 +473,7 @@ const Patient = props => {
                               </Grid>
                               <Grid item xs={12} sm={6} md={4}>
                                  <CustomSelect
+                                    className='patient-outcome'
                                     options={[
                                        { id: 'pending', name: 'Internado' },
                                        { id: 'discharge', name: 'Alta' },
@@ -384,7 +488,11 @@ const Patient = props => {
                               </Grid>
 
                               <Grid item xs={12} sm={6} md={4}>
-                                 <FormControl variant='outlined' fullWidth>
+                                 <FormControl
+                                    variant='outlined'
+                                    fullWidth
+                                    className='patient-outcome-date'
+                                 >
                                     <Field
                                        component={DatePicker}
                                        inputVariant='outlined'
@@ -400,7 +508,11 @@ const Patient = props => {
                                  </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6} md={4}>
-                                 <FormControl variant='outlined' fullWidth>
+                                 <FormControl
+                                    variant='outlined'
+                                    fullWidth
+                                    className='patient-outcome-time'
+                                 >
                                     <Field
                                        component={TimePicker}
                                        inputVariant='outlined'
@@ -426,10 +538,12 @@ const Patient = props => {
                                        type='button'
                                        component={Link}
                                        to={`/nas?patient_id=${id}`}
+                                       className='patient-history-nas'
                                     >
                                        Histórico
                                     </Button>
                                     <NasDialog
+                                       classNameButton='patient-late-nas'
                                        title='Selecione a data do nas'
                                        variant='contained'
                                        textButton={
@@ -453,7 +567,7 @@ const Patient = props => {
                                  loading={loading}
                                  success={success}
                                  wrapperClass={classes.wrapperLoading}
-                                 className={classes.buttonSubmit}
+                                 className={`${classes.buttonSubmit} save-button`}
                               >
                                  Salvar
                               </ButtonLoading>

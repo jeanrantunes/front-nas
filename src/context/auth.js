@@ -2,7 +2,7 @@ import React, { useContext, useState, useLayoutEffect } from 'react'
 import { useAsync } from 'react-async'
 
 import api from '../services/api'
-import { setToken, clearToken, getToken } from '../helpers/token'
+import { setToken, clearToken, getToken, setFirstTime } from '../helpers/token'
 import Loader from '../components/Loader'
 
 const getUserByToken = async () => {
@@ -48,11 +48,15 @@ const AuthProvider = props => {
 
    const login = async data => {
       try {
+         const { firstTime } = data
          const response = await api.post('v1/users/login', data)
          const { token, ...user } = response.data
          setToken(token)
          reload()
          window.location.href = '/'
+         if (firstTime) {
+            setFirstTime()
+         }
          return { user }
       } catch (err) {
          // console.log(err)

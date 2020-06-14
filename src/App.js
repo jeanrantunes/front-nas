@@ -4,6 +4,8 @@ import Routes from './routes'
 import store from './store'
 import Loader from './components/Loader'
 
+import 'intro.js/introjs.css'
+
 const App = () => {
    return (
       <Provider store={store}>

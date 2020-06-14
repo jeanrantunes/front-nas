@@ -9,6 +9,8 @@ const MT = props => {
       urlGet,
       urlPost,
       urlPut,
+      loader,
+      setLoader,
       urlDelete,
       className,
       ...rest
@@ -20,6 +22,7 @@ const MT = props => {
             columns={[{ title: columnTitle, field: 'name' }]}
             data={query =>
                new Promise(async (resolve, reject) => {
+                  setLoader(true)
                   let {
                      orderDirection: order_type,
                      page,
@@ -42,7 +45,9 @@ const MT = props => {
                         page: data.metadata.page,
                         totalCount: data.metadata.total
                      })
+                     setLoader(false)
                   } catch (err) {
+                     setLoader(false)
                      reject('Sem dados')
                   }
                })
@@ -50,34 +55,43 @@ const MT = props => {
             editable={{
                onRowAdd: newData =>
                   new Promise(async (resolve, reject) => {
+                     setLoader(true)
                      try {
                         const { data } = await api.post(urlPost, newData)
+                        setLoader(false)
                         resolve(data)
                      } catch (err) {
+                        setLoader(false)
                         reject('Erro')
                      }
                   }),
                onRowUpdate: (newData, oldData) =>
                   new Promise(async (resolve, reject) => {
+                     setLoader(true)
                      delete newData.id
                      try {
                         const { data } = await api.put(
                            `${urlPut}/${oldData.id}`,
                            newData
                         )
+                        setLoader(false)
                         resolve(data)
                      } catch (err) {
+                        setLoader(false)
                         reject('Erro')
                      }
                   }),
                onRowDelete: oldData =>
                   new Promise(async (resolve, reject) => {
+                     setLoader(true)
                      try {
                         const { data } = await api.delete(
                            `${urlDelete}/${oldData.id}`
                         )
+                        setLoader(false)
                         resolve(data)
                      } catch (err) {
+                        setLoader(false)
                         reject('Erro')
                      }
                   })

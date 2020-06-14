@@ -34,6 +34,7 @@ import { debounce } from 'lodash-es'
 import { formatPTDateTime } from '../../helpers/date'
 
 import { requestPatients, removePatient } from '../../store/actions/patients'
+import { enableSteps, enableButtonHelp } from '../../store/actions/stepByStep'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
 import AnimatedBadge from '../../components/AnimatedBadge'
@@ -134,8 +135,9 @@ const SkeletonList = () => {
    return <List className={classes.list}>{array}</List>
 }
 
-const Patients = () => {
+const Patients = props => {
    const patients = useSelector(store => store.patients)
+
    const theme = useTheme()
    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
    const [patientId, setPatientId] = useState(null)
@@ -228,9 +230,68 @@ const Patients = () => {
       sortedBy
    ])
 
+   useEffect(() => {
+      if (!patients.loading && !!patients.data.length) {
+         dispatch(enableButtonHelp())
+         dispatch(enableSteps())
+      }
+   }, [patients.loading, patients.data, dispatch])
+
    return (
-      <Layout>
-         <Paper elevation={1} className={classes.filter}>
+      <Layout
+         {...props}
+         steps={[
+            {
+               element: '.patients-link',
+               intro: 'Lista como todos os pacientes cadastrados no sistema'
+            },
+            {
+               element: '.filter-patients',
+               intro: 'Filtros para os pacientes'
+            },
+            {
+               element: '.name-patient',
+               intro: 'Filtrar pelo nome do paciente'
+            },
+            {
+               element: '.outcome-patient',
+               intro: 'Filtrar pelo desfecho do paciente do paciente'
+            },
+            {
+               element: '.bed-filter-patient',
+               intro: 'Filtrar pelos leitos da UTI'
+            },
+            {
+               element: '.hospitalization-patient',
+               intro: 'Filtrar pela data de internação'
+            },
+            {
+               element: '.outcome-date-patient',
+               intro: 'Filtrar pela data do desfecho'
+            },
+            {
+               element: '.sort-patient',
+               intro: 'Ordenar os pacientes pela data de internação'
+            },
+            {
+               element: '.clear-patient',
+               intro: 'Limpar os filtros'
+            },
+            {
+               element: '.bed-patient',
+               intro: 'Leito do paciente'
+            },
+            {
+               element: '.info-patient',
+               intro: 'Informações sobre o paciente'
+            },
+            {
+               element: '.delete-patient',
+               intro: 'Excluir o paciente do sistema'
+            }
+         ]}
+      >
+         <Paper elevation={1} className={`${classes.filter} filter-patients`}>
             <Grid container component='main' spacing={2}>
                <Grid item xs={12} sm={6} lg={4}>
                   <TextField
@@ -242,10 +303,15 @@ const Patients = () => {
                      onChange={e => handleInputName(e.target.value)}
                      fullWidth
                      disabled={patients.loading}
+                     className='name-patient'
                   />
                </Grid>
                <Grid item xs={12} sm={6} lg={4}>
-                  <FormControl variant='outlined' fullWidth>
+                  <FormControl
+                     variant='outlined'
+                     fullWidth
+                     className='outcome-patient'
+                  >
                      <InputLabel id='outcome-label'>Desfecho</InputLabel>
                      <Select
                         labelId='outcome-label'
@@ -266,7 +332,11 @@ const Patients = () => {
                   </FormControl>
                </Grid>
                <Grid item xs={12} sm={6} lg={4}>
-                  <FormControl variant='outlined' fullWidth>
+                  <FormControl
+                     variant='outlined'
+                     fullWidth
+                     className='bed-filter-patient'
+                  >
                      <InputLabel id='bed-label'>Leito</InputLabel>
                      <Select
                         labelId='bed-label'
@@ -299,6 +369,7 @@ const Patients = () => {
                      setStartDate={setHospitalizationStartDate}
                      setEndDate={setHospitalizationEndDate}
                      disabled={patients.loading}
+                     className='hospitalization-patient'
                   />
                </Grid>
                <Grid item xs={12} sm={6} lg={5}>
@@ -311,6 +382,7 @@ const Patients = () => {
                      setStartDate={setOutcomeStartDate}
                      setEndDate={setOutcomeEndDate}
                      disabled={patients.loading}
+                     className='outcome-date-patient'
                   />
                </Grid>
                <Grid
@@ -328,6 +400,7 @@ const Patients = () => {
                      aria-label='more'
                      aria-controls='long-menu'
                      aria-haspopup='true'
+                     className='sort-patient'
                      onClick={e => setAnchorEl(e.currentTarget)}
                   >
                      <FilterList />
@@ -354,6 +427,7 @@ const Patients = () => {
                      aria-label='more'
                      aria-controls='long-menu'
                      aria-haspopup='true'
+                     className='clear-patient'
                      onClick={cleanFilters}
                   >
                      <Close />
@@ -388,7 +462,9 @@ const Patients = () => {
                                           color='#76ff03'
                                           overlap='circle'
                                        >
-                                          <Avatar>{patient.bed}</Avatar>
+                                          <Avatar className='bed-patient'>
+                                             {patient.bed}
+                                          </Avatar>
                                        </AnimatedBadge>
                                     ) : (
                                        <Avatar>{patient.bed}</Avatar>
@@ -396,6 +472,7 @@ const Patients = () => {
                                  </ListItemIcon>
                                  <Grid item xs={7} sm={10} md={12}>
                                     <ListItemText
+                                       className='info-patient'
                                        id={labelId}
                                        primary={patient.name}
                                        secondary={
@@ -417,6 +494,7 @@ const Patients = () => {
                                  </Grid>
                                  <ListItemSecondaryAction>
                                     <IconButton
+                                       className='delete-patient'
                                        edge='end'
                                        aria-label='delete'
                                        onClick={() => deletePatient(patient.id)}

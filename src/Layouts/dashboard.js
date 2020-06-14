@@ -1,6 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import clsx from 'clsx'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
+import { getFirstTime, clearFirstTime } from '../helpers/token'
+
 import { Link } from 'react-router-dom'
 import {
    CssBaseline,
@@ -18,6 +21,14 @@ import {
    Divider,
    IconButton,
    Avatar,
+   Fab,
+   Dialog,
+   DialogTitle,
+   DialogContent,
+   DialogContentText,
+   DialogActions,
+   Button,
+   Slide,
    useMediaQuery
 } from '@material-ui/core'
 import {
@@ -27,8 +38,16 @@ import {
    Menu,
    Settings,
    SupervisedUserCircle,
-   ExitToApp
+   ExitToApp,
+   Help
 } from '@material-ui/icons'
+import { Steps } from 'intro.js-react'
+import './tooltipHelp.css'
+import {
+   enableSteps,
+   disableSteps,
+   disableButtonHelp
+} from '../store/actions/stepByStep'
 
 import { deepPurple } from '@material-ui/core/colors'
 
@@ -90,6 +109,11 @@ const stylesLayout = makeStyles(theme => ({
    links: {
       paddingTop: 10,
       paddingBottom: 10
+   },
+   help: {
+      left: 16,
+      bottom: 16,
+      position: 'fixed'
    }
 }))
 
@@ -97,35 +121,141 @@ function ListItemLink(props) {
    return <ListItem button component='a' {...props} />
 }
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+   return <Slide direction='up' ref={ref} {...props} />
+})
+
 const Layout = props => {
    const theme = useTheme()
    const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+   const steps = useSelector(store => store.steps)
 
+   const dispatch = useDispatch()
    const classes = stylesLayout()
-   const [open, setOpen] = React.useState(false)
+   const [open, setOpen] = useState(false)
+   const [openModalSteps, setOpenModalSteps] = useState(!!getFirstTime())
+   const [activeSteps, setActiveSteps] = useState(false)
+
    const { logout } = useAuth()
    const { user } = useUser()
-   // console.log(props)
+
    useEffect(() => {
-      // console.log(isMobile)
       if (isMobile) {
          setOpen(false)
+         dispatch(disableButtonHelp())
+         setOpenModalSteps(false)
+         dispatch(disableSteps())
          return
       }
+
       setOpen(true)
-   }, [isMobile])
+   }, [isMobile, dispatch])
+
+   useEffect(() => {
+      if (getFirstTime()) {
+         dispatch(enableSteps())
+      }
+   }, [dispatch])
+
+   useEffect(() => {
+      if (props.match.url !== '/' && getFirstTime() && !isMobile) {
+         setOpenModalSteps(false)
+         setActiveSteps(true)
+      }
+   }, [props.match.url, isMobile])
 
    const handleDrawerOpen = () => {
       setOpen(!open)
    }
 
+   const onActiveStepsByFirstTime = () => {
+      setActiveSteps(true)
+      setOpenModalSteps(false)
+   }
+
+   const handleCloseModalSteps = () => {
+      setOpenModalSteps(false)
+      clearFirstTime()
+      dispatch(disableSteps())
+   }
+   console.log()
    return (
       <div className={classes.root}>
          <CssBaseline />
+         {props.steps && steps.stepsEnabled && steps.buttonHelp && (
+            <Steps
+               enabled={activeSteps}
+               steps={props.steps.filter(s => s)}
+               initialStep={steps.initialStep}
+               options={{
+                  prevLabel: 'Anterior',
+                  nextLabel: 'Próximo',
+                  skipLabel: 'Sair',
+                  doneLabel: getFirstTime() ? 'Próximo' : 'Fechar',
+                  showStepNumbers: false,
+                  hidePrev: true,
+                  hideNext: true,
+                  tooltipClass: 'tooltip-help',
+                  showProgress: true,
+                  scrollToElement: false,
+                  disableInteraction: true
+               }}
+               onComplete={() => {
+                  dispatch(disableSteps())
+
+                  if (!getFirstTime()) {
+                     return
+                  }
+
+                  switch (props.match.url) {
+                     case '/':
+                        props.history.push('/patients')
+                        break
+                     case '/patients':
+                        props.history.push('/nas')
+                        break
+                     case '/nas':
+                        if (user.role === 'USER') {
+                           clearFirstTime()
+                           dispatch(disableSteps())
+                           props.history.push('/')
+                           break
+                        }
+                        props.history.push('/invite-users')
+                        break
+                     case '/invite-users':
+                        props.history.push('/cms')
+                        break
+                     case '/cms':
+                        clearFirstTime()
+                        dispatch(disableSteps())
+                        props.history.push('/')
+                        break
+                     default:
+                        dispatch(disableSteps())
+                        break
+                  }
+               }}
+               onExit={stepIndex => {
+                  dispatch(disableSteps())
+               }}
+               onBeforeExit={stepIndex => {
+                  dispatch(disableSteps())
+                  if (!stepIndex) {
+                     return
+                  }
+
+                  if (stepIndex < props.steps.length - 1) {
+                     clearFirstTime()
+                  }
+               }}
+            />
+         )}
          <AppBar position='fixed' className={classes.appBar}>
             <Toolbar>
                <IconButton
                   color='inherit'
+                  className='menu-button'
                   aria-label='abrir menu'
                   edge='start'
                   onClick={handleDrawerOpen}
@@ -138,6 +268,7 @@ const Layout = props => {
                <div className={classes.grow} />
                <IconButton
                   color='inherit'
+                  className='exit-button'
                   aria-label='sair'
                   edge='start'
                   onClick={logout}
@@ -157,6 +288,7 @@ const Layout = props => {
             }}
          >
             {!isMobile && <div className={classes.toolbar} />}
+
             <List>
                <ListItem className={classes.avatar}>
                   <ListItemAvatar>
@@ -165,14 +297,18 @@ const Layout = props => {
                   <ListItemText primary={user.name} />
                </ListItem>
                <Divider />
-               <ListItem className={classes.links} component={Link} to='/'>
+               <ListItem
+                  className={`${classes.links} beds-link`}
+                  component={Link}
+                  to='/'
+               >
                   <ListItemIcon>
                      <AirlineSeatIndividualSuite />
                   </ListItemIcon>
                   <ListItemText primary={'Leitos'} />
                </ListItem>
                <ListItemLink
-                  className={classes.links}
+                  className={`${classes.links} patients-link`}
                   component={Link}
                   to='/patients'
                >
@@ -182,7 +318,7 @@ const Layout = props => {
                   <ListItemText primary={'Pacientes'} />
                </ListItemLink>
                <ListItemLink
-                  className={classes.links}
+                  className={`${classes.links} nas-link`}
                   component={Link}
                   to={{
                      pathname: '/nas',
@@ -197,7 +333,7 @@ const Layout = props => {
                {user.role === 'ADMIN' && (
                   <React.Fragment>
                      <ListItemLink
-                        className={classes.links}
+                        className={`${classes.links} add-user-link`}
                         component={Link}
                         to={{
                            pathname: '/invite-users'
@@ -209,7 +345,7 @@ const Layout = props => {
                         <ListItemText primary={'Adicionar usuários'} />
                      </ListItemLink>
                      <ListItemLink
-                        className={classes.links}
+                        className={`${classes.links} management-link`}
                         component={Link}
                         to={{
                            pathname: '/cms'
@@ -223,15 +359,58 @@ const Layout = props => {
                   </React.Fragment>
                )}
             </List>
+            {steps.buttonHelp && !isMobile && (
+               <Fab
+                  className={`${classes.help} help-button`}
+                  color='secondary'
+                  aria-label='edit'
+                  onClick={() => {
+                     dispatch(enableSteps())
+                     setActiveSteps(true)
+                  }}
+               >
+                  <Help />
+               </Fab>
+            )}
          </Drawer>
          <main
-            // maxWidth='lg'
             className={clsx(classes.content, {
                [classes.contentShift]: open
             })}
          >
             <Container maxWidth='lg' disableGutters={isMobile}>
                <div className={classes.toolbar} />
+               <Dialog
+                  open={openModalSteps}
+                  onClose={handleCloseModalSteps}
+                  aria-labelledby='alert-dialog-title'
+                  aria-describedby='alert-dialog-description'
+                  TransitionComponent={Transition}
+               >
+                  <DialogTitle id='alert-dialog-title'>
+                     {'TOUR pelo NAS'}
+                  </DialogTitle>
+                  <DialogContent>
+                     <DialogContentText id='alert-dialog-description'>
+                        Notei que é sua primeira vez por aqui...
+                        <br />
+                        Deseja fazer um tour pelo sistema para conhecer melhor
+                        suas funcionalidades?
+                     </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                     <Button onClick={handleCloseModalSteps} color='primary'>
+                        Não
+                     </Button>
+                     <Button
+                        onClick={onActiveStepsByFirstTime}
+                        color='primary'
+                        autoFocus
+                     >
+                        Sim
+                     </Button>
+                  </DialogActions>
+               </Dialog>
                <Box mt={2}>{props.children}</Box>
             </Container>
          </main>

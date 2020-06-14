@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { makeStyles } from '@material-ui/core/styles'
 import { TextField, Snackbar } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
+import { useDispatch } from 'react-redux'
 import { green, red } from '@material-ui/core/colors'
 
 import api from '../../services/api'
@@ -12,6 +13,7 @@ import {
    emailValidation,
    roleValidation
 } from '../../utils/validations'
+import { enableSteps, enableButtonHelp } from '../../store/actions/stepByStep'
 import Layout from '../../Layouts/dashboard'
 import CustomSelect from '../../containers/CustomSelect'
 import ButtonLoading from '../../components/ButtonLoading'
@@ -48,9 +50,10 @@ const LoginSchema = Yup.object().shape({
    role: Yup.string().required(roleValidation.required)
 })
 
-const Invite = () => {
+const Invite = props => {
    const classes = useStyles()
    const { user } = useUser()
+   const dispatch = useDispatch()
 
    const [loading, setLoading] = useState(false)
    const [success, setSuccess] = useState(false)
@@ -58,8 +61,36 @@ const Invite = () => {
 
    const timeSnack = 2000
 
+   useEffect(() => {
+      setTimeout(() => {
+         dispatch(enableSteps())
+         dispatch(enableButtonHelp())
+      }, 1000)
+   }, [dispatch])
+
    return (
-      <Layout>
+      <Layout
+         {...props}
+         steps={[
+            {
+               element: '.add-user-link',
+               intro: 'Envio de convites para novos membros dos sistema NAS'
+            },
+            {
+               element: '.invited-name',
+               intro: 'Nome do usuário a ser convidado'
+            },
+            {
+               element: '.invited-email',
+               intro: 'E-mail do usuário a ser convidado'
+            },
+            {
+               element: '.invited-role',
+               intro:
+                  'Nível de permissião do usuário a ser convidado. \n Existem 2 níveis de permissão: \n administrador: usuário pode gerenciar conteúdo e adicionar outros usuários e \n usuário: usuário pode utilizar o sistema, porém não poderá enviar convites para outros usuários e nem gerenciar o conteúdo de comorbidades e motivos de internação'
+            }
+         ]}
+      >
          <Formik
             initialValues={{ name: '', email: '', role: '' }}
             validationSchema={LoginSchema}
@@ -108,7 +139,7 @@ const Invite = () => {
                      noValidate
                   >
                      <TextField
-                        className={classes.input}
+                        className={`${classes.input} invited-name`}
                         variant='outlined'
                         margin='normal'
                         required
@@ -127,7 +158,7 @@ const Invite = () => {
                      />
 
                      <TextField
-                        className={classes.input}
+                        className={`${classes.input} invited-email`}
                         variant='outlined'
                         margin='normal'
                         required
@@ -145,9 +176,9 @@ const Invite = () => {
                         }
                      />
                      <CustomSelect
-                        className={classes.input}
+                        className={`${classes.input} invited-role`}
                         options={[
-                           //    { id: '', name: 'Nenhum' },
+                           { id: '', name: 'Selecione' },
                            { id: 'USER', name: 'Usuário' },
                            { id: 'ADMIN', name: 'Administrador' }
                         ]}

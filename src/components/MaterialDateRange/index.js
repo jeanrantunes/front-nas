@@ -42,7 +42,8 @@ const MaterialDateRange = ({
    setStartDate,
    setEndDate,
    inputRef,
-   disabled
+   disabled,
+   className
 }) => {
    const classes = useStyles()
    const [preDate, setPreDate] = useState([null, null])
@@ -155,6 +156,7 @@ const MaterialDateRange = ({
             inputRef={inputRef}
             disabled={disabled}
             fullWidth
+            className={className}
          />
          <Backdrop className={classes.backdrop} open={show}>
             <Card className={classes.daterangeContainer}>

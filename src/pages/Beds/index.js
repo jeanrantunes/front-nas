@@ -30,15 +30,18 @@ import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { red, orange, cyan, lime } from '@material-ui/core/colors'
 import { Add, MoreVert, Assignment, Ballot, Cake } from '@material-ui/icons'
 import Skeleton from '@material-ui/lab/Skeleton'
-
 import {
    requestPatients,
    updatePatient,
    removePatient
 } from '../../store/actions/patients'
+
+import { enableSteps, enableButtonHelp } from '../../store/actions/stepByStep'
+
 import { age, isItBirthday } from '../../helpers/date'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
+
 import AnimatedBadge from '../../components/AnimatedBadge'
 import { dailyAveragePatientsNas } from '../../utils/nas-func'
 
@@ -47,6 +50,7 @@ const TransitionDialog = React.forwardRef(function Transition(props, ref) {
 })
 
 const useStyles = makeStyles(theme => ({
+   cardPatient: {},
    cardContent: {
       minHeight: 150
    },
@@ -203,7 +207,7 @@ const SkeletonCards = () => {
    for (let i = 0; i < 6; i++) {
       array.push(
          <Grid key={i} item xs={12} md={6} lg={4}>
-            <Card className={classes.card}>
+            <Card>
                <CardHeader
                   avatar={
                      <Skeleton
@@ -331,8 +335,78 @@ const Beds = props => {
       )
    }, [dispatch])
 
+   useEffect(() => {
+      if (!patients.loading && !!patients.data.length) {
+         dispatch(enableSteps())
+         dispatch(enableButtonHelp())
+      }
+   }, [patients.loading, patients.data, dispatch])
+
    return (
-      <Layout>
+      <Layout
+         {...props}
+         steps={[
+            {
+               element: '.beds-link',
+               intro: 'Todos os 6 pacientes internados na UTI'
+            },
+            {
+               element: '.average-nas',
+               intro: 'Média dos últimos 6 NAS cadastrados'
+            },
+            {
+               element: '.gavidity-1',
+               intro: 'Indica o paciente mais grave'
+            },
+
+            {
+               element: '.gavidity-2',
+               intro: 'Indica o segundo paciente mais grave'
+            },
+            {
+               element: '.gavidity-3',
+               intro: 'Indica o terceiro paciente mais grave'
+            },
+            {
+               element: '.register-nas',
+               intro:
+                  'Indica que não foi cadastrado o NAS diário. Esse indicador aparece no botão Cadastrar NAS'
+            },
+            {
+               element: '.add-patient',
+               intro: 'Adicionar o paciente a UTI'
+            },
+            {
+               element: '.card-patient',
+               intro: 'Representa o paciente internado'
+            },
+            {
+               element: '.bed',
+               intro: 'Leito do paciente'
+            },
+            {
+               element: '.options-patient',
+               intro:
+                  'Contém configurações do paciente: Editar dados, Histórico NAS e Excluir'
+            },
+            {
+               element: '.content-patient',
+               intro: 'Informações do paciente'
+            },
+            {
+               element: '.nas-button',
+               intro: 'Cadastrar o NAS diário'
+            },
+            {
+               element: '.outcome-button',
+               intro: 'Dar um desfecho para o paciente: alta ou óbito'
+            },
+            {
+               element: '.exit-button',
+               intro: 'Sair do sistema'
+            }
+         ]}
+      >
          {anchorEl && patient && (
             <MenuPatient
                anchor={anchorEl}
@@ -367,20 +441,85 @@ const Beds = props => {
                </React.Fragment>
             ) : !patients.loading && !!patients.data.length ? (
                <React.Fragment>
+                  {/* <StepByStep
+                     steps={[
+                        
+                        {
+                           element: '.average-nas',
+                           intro: 'Média dos últimos 6 NAS'
+                        },
+                        {
+                           element: '.gavidity-1',
+                           intro: 'Indica o paciente mais grave'
+                        },
+
+                        {
+                           element: '.gavidity-2',
+                           intro: 'Indica o segundo paciente mais grave'
+                        },
+                        {
+                           element: '.gavidity-3',
+                           intro: 'Indica o terceiro paciente mais grave'
+                        },
+                        {
+                           element: '.register-nas',
+                           intro: 'Indica que não foi cadastrado o NAS de hoje'
+                        },
+                        {
+                           element: '.add-patient',
+                           intro: 'Adicionar um paciente'
+                        },
+                        {
+                           element: '.card-patient',
+                           intro: 'Representa um paciente internado'
+                        },
+                        {
+                           element: '.bed',
+                           intro: 'Leito do paciente'
+                        },
+                        {
+                           element: '.options-patient',
+                           intro:
+                              'Contém configurações do paciente: Editar dados, Histórico NAS e Excluir'
+                        },
+                        {
+                           element: '.content-patient',
+                           intro: 'Informações sobre o paciente'
+                        },
+                        {
+                           element: '.nas-button',
+                           intro: 'Cadastrar o NAS do dia'
+                        },
+                        {
+                           element: '.outcome-button',
+                           intro:
+                              'Dar um desfecho para o paciente: alta ou óbito'
+                        }
+                     ]}
+                  /> */}
                   <Grid item xs={12} sm={6}>
                      {hasNas(patients.data) && (
                         <Typography variant='h5' gutterBottom>
-                           Média diária:{' '}
-                           {dailyAveragePatientsNas(patients.data).toFixed(1)}
+                           <span className='average-nas'>
+                              Média diária:{' '}
+                              {dailyAveragePatientsNas(patients.data).toFixed(
+                                 1
+                              )}
+                           </span>
                         </Typography>
                      )}
                   </Grid>
 
                   <Grid item xs={12} sm={6}>
-                     <Typography align='right' variant='body2' gutterBottom>
+                     <Typography
+                        align='right'
+                        variant='body2'
+                        gutterBottom
+                        className='gravity-info'
+                     >
                         Escala de gravidade:{' '}
                         <AnimatedBadge
-                           className={classes.scaleBadge}
+                           className={`${classes.scaleBadge} gavidity-1`}
                            vertical='bottom'
                            horizontal='right'
                            color={red[500]}
@@ -388,7 +527,7 @@ const Beds = props => {
                            {' '}
                         </AnimatedBadge>
                         <AnimatedBadge
-                           className={classes.scaleBadge}
+                           className={`${classes.scaleBadge} gavidity-2`}
                            vertical='bottom'
                            horizontal='right'
                            color={orange[600]}
@@ -396,7 +535,7 @@ const Beds = props => {
                            {' '}
                         </AnimatedBadge>
                         <AnimatedBadge
-                           className={classes.scaleBadge}
+                           className={`${classes.scaleBadge} gavidity-3`}
                            vertical='bottom'
                            horizontal='right'
                            color={cyan[500]}
@@ -407,7 +546,7 @@ const Beds = props => {
                      <Typography align='right' variant='body2' gutterBottom>
                         Cadastrar NAS diário:{' '}
                         <AnimatedBadge
-                           className={classes.scaleBadge}
+                           className={`${classes.scaleBadge} register-nas`}
                            vertical='bottom'
                            horizontal='right'
                            color={lime[500]}
@@ -420,11 +559,14 @@ const Beds = props => {
                      <React.Fragment key={patient.id}>
                         {patient.outcome === 'pending' && (
                            <Grid item xs={12} md={6} lg={4}>
-                              <Card className={classes.card}>
+                              <Card className='card-patient'>
                                  <CardHeader
                                     avatar={
                                        <React.Fragment>
-                                          <Avatar aria-label='recipe'>
+                                          <Avatar
+                                             aria-label='recipe'
+                                             className='bed'
+                                          >
                                              {patient.bed}
                                           </Avatar>
                                        </React.Fragment>
@@ -435,6 +577,7 @@ const Beds = props => {
                                              <Cake color='secondary' />
                                           )}
                                           <IconButton
+                                             className='options-patient'
                                              aria-controls='simple-menu'
                                              aria-haspopup='true'
                                              onClick={e =>
@@ -451,7 +594,9 @@ const Beds = props => {
                                        `${age(patient.birthday)} anos`
                                     }
                                  />
-                                 <CardContent className={classes.cardContent}>
+                                 <CardContent
+                                    className={`${classes.cardContent} content-patient`}
+                                 >
                                     {patient.average > 0 && (
                                        <Typography
                                           variant='body2'
@@ -564,6 +709,7 @@ const Beds = props => {
                                           startIcon={<Assignment />}
                                           to={`/nas/${patient.id}`}
                                           component={Link}
+                                          className='nas-button'
                                           disabled={patient.daily_nas}
                                        >
                                           {isMobile
@@ -576,6 +722,7 @@ const Beds = props => {
                                        variant='outlined'
                                        size='small'
                                        color='primary'
+                                       className='outcome-button'
                                        onClick={e =>
                                           handleClickOucome(e, patient)
                                        }
@@ -599,7 +746,7 @@ const Beds = props => {
          </Grid>
 
          <Fab
-            className={classes.fab}
+            className={`${classes.fab} add-patient`}
             color='primary'
             aria-label='add'
             onClick={handleClickAddPatient}

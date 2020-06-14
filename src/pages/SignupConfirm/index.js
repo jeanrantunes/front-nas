@@ -112,7 +112,7 @@ const SignupConfirm = () => {
             const { data } = await api.get('v1/users/signup-confirm', {
                params: { token }
             })
-            setUser(data)
+            setUser({ ...data, firstTime: true })
          } catch {
             setUser(null)
          }
@@ -160,7 +160,7 @@ const SignupConfirm = () => {
                   validationSchema={SignupSchema}
                   onSubmit={async (values, { setSubmitting }) => {
                      const { passwordConfirmation, ...rest } = values
-                     const { id, token, role } = user
+                     const { id, token, role, firstTime } = user
                      setLoading(true)
                      setSuccess(false)
                      setError(false)
@@ -174,7 +174,11 @@ const SignupConfirm = () => {
 
                         const { email } = user
 
-                        await login({ email, password: rest.password })
+                        await login({
+                           email,
+                           password: rest.password,
+                           firstTime
+                        })
                         setLoading(false)
                         setError(false)
                         setSuccess(true)

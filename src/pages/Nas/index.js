@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+
 import { Formik } from 'formik'
 import {
    Grid,
@@ -21,6 +23,8 @@ import { Alert } from '@material-ui/lab'
 import { green, red } from '@material-ui/core/colors'
 
 import { makeStyles } from '@material-ui/core/styles'
+
+import { enableButtonHelp } from '../../store/actions/stepByStep'
 
 import Layout from '../../Layouts/dashboard'
 import api from '../../services/api'
@@ -122,6 +126,7 @@ function getStepContent(step, classes, values, handleChange) {
                   name='monitoring_and_controls'
                   value={values.monitoring_and_controls}
                   onChange={handleChange}
+                  className={'step-1'}
                >
                   <FormControlLabel
                      value='1a'
@@ -129,7 +134,7 @@ function getStepContent(step, classes, values, handleChange) {
                         <Radio className={classes.radio} color='primary' />
                      }
                      label='1a) Sinais vitais horários, cálculo e registro regular do balanço hídrico (registro de ingesta/ excreta)'
-                     className={classes.controlradio}
+                     className={`${classes.controlradio} option-1`}
                   />
                   <FormControlLabel
                      value='1b'
@@ -880,6 +885,7 @@ function getSteps() {
 
 const Nas = props => {
    const classes = useStyles()
+   const dispatch = useDispatch()
 
    const { id } = props.match.params
 
@@ -914,6 +920,12 @@ const Nas = props => {
       }
    }, [id])
 
+   useEffect(() => {
+      setTimeout(() => {
+         dispatch(enableButtonHelp())
+      }, 1000)
+   }, [dispatch])
+
    const [activeStep, setActiveStep] = React.useState(0)
    const steps = getSteps()
 
@@ -926,7 +938,23 @@ const Nas = props => {
    }
 
    return (
-      <Layout>
+      <Layout
+         {...props}
+         steps={[
+            {
+               element: '.step-1',
+               intro: 'Primeiro item do NAS: Monitorização e controles'
+            },
+            {
+               element: '.option-1',
+               intro: 'Opção selecionada'
+            },
+            {
+               element: '.expand-button',
+               intro: 'Expande ou retrai todos os 23 itens do NAS'
+            }
+         ]}
+      >
          <Grid container>
             <Grid item xs={12}>
                <Button
@@ -934,7 +962,7 @@ const Nas = props => {
                   color='primary'
                   startIcon={openAll ? <UnfoldLess /> : <UnfoldMoreOutlined />}
                   onClick={() => setOpenAll(!openAll)}
-                  className={classes.expandButton}
+                  className={`${classes.expandButton} expand-button`}
                >
                   {openAll ? 'Retrair' : 'Expandir'}
                </Button>

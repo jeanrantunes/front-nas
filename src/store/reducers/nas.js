@@ -2,7 +2,7 @@ const INITIAL_STATE = {
    data: [],
    metadata: null,
    filter: null,
-   loading: false,
+   loading: true,
    error: false
 }
 

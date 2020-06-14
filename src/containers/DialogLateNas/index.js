@@ -74,7 +74,7 @@ const Actions = withStyles(theme => ({
 }))(DialogActions)
 
 const DialogLateNas = props => {
-   const { typeButton, variant, patient_id, history } = props
+   const { typeButton, variant, patient_id, history, classNameButton } = props
    let { color, textButton, title, textButtonAction } = props
    const classes = useStyles()
    const [open, setOpen] = useState(false)
@@ -142,12 +142,17 @@ const DialogLateNas = props => {
             <Fab
                color={color}
                onClick={handleClickOpen}
-               className={classes.fab}
+               className={`${classes.fab} ${classNameButton}`}
             >
                <Add />
             </Fab>
          ) : (
-            <Button variant={variant} color={color} onClick={handleClickOpen}>
+            <Button
+               variant={variant}
+               color={color}
+               className={classNameButton}
+               onClick={handleClickOpen}
+            >
                {textButton}
             </Button>
          )}

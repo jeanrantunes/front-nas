@@ -30,6 +30,8 @@ import {
 import DateRange from '../../components/MaterialDateRange'
 import { debounce } from 'lodash-es'
 
+import { enableSteps, enableButtonHelp } from '../../store/actions/stepByStep'
+
 import { requestNas, removeNas } from '../../store/actions/nas'
 import api from '../../services/api'
 
@@ -260,6 +262,13 @@ const Nas = props => {
       firstTime
    ])
 
+   useEffect(() => {
+      if (!nas.loading && !!nas.data.length) {
+         dispatch(enableSteps())
+         dispatch(enableButtonHelp())
+      }
+   }, [nas.loading, nas.data, dispatch])
+
    const handleInputName = debounce(name => {
       setPage(0)
       setName(name)
@@ -289,9 +298,55 @@ const Nas = props => {
    }
 
    return (
-      <Layout>
+      <Layout
+         {...props}
+         steps={[
+            {
+               element: '.nas-link',
+               intro: 'Lista como todos os NAS cadastrados no sistema'
+            },
+            {
+               element: '.filter-nas',
+               intro: 'Filtros para os NAS cadastrados no sistema'
+            },
+            {
+               element: '.number-nas',
+               intro: 'Filtrar pelo código do NAS'
+            },
+            {
+               element: '.patient-name',
+               intro:
+                  'Filtrar pelo Nome do paciente. \n Obs: Não precisa ser o nome completo.'
+            },
+            {
+               element: '.created-nas',
+               intro: 'Filtrar pela data de criação do NAS'
+            },
+            {
+               element: '.sort-nas',
+               intro: 'Ordenar a lista de NAS pela data de criação'
+            },
+            {
+               element: '.clear-nas',
+               intro: 'Limpar os filtros aplicados'
+            },
+            {
+               element: '.average-nas',
+               intro: 'Pontuação NAS'
+            },
+            {
+               element: '.info-nas',
+               intro:
+                  'Informações sobre o NAS: Código do NAS, nome do paciente e data de criação do NAS'
+            },
+            {
+               element: '.delete-nas',
+               intro: 'Excluir o NAS do sistema'
+            }
+         ]}
+      >
          <Paper elevation={1} className={classes.filter}>
-            <Grid container component='main' spacing={2}>
+            <Grid container component='main' spacing={2} className='filter-nas'>
                <Grid item xs={12} sm={6} lg={3}>
                   <TextField
                      id='id-nas'
@@ -308,6 +363,7 @@ const Nas = props => {
                      }}
                      fullWidth
                      disabled={nas.loading}
+                     className='number-nas'
                   />
                </Grid>
                <Grid item xs={12} sm={6} lg={4}>
@@ -333,6 +389,7 @@ const Nas = props => {
                            : {})
                      }}
                      disabled={nas.loading}
+                     className='patient-name'
                   />
                </Grid>
                <Grid item xs={12} sm={6} lg={4}>
@@ -345,6 +402,7 @@ const Nas = props => {
                      setEndDate={setCreatedEndDate}
                      inputRef={dateInputRef}
                      disabled={nas.loading}
+                     className='created-nas'
                   />
                </Grid>
                <Grid
@@ -363,6 +421,7 @@ const Nas = props => {
                      aria-controls='long-menu'
                      aria-haspopup='true'
                      onClick={e => setAnchorEl(e.currentTarget)}
+                     className='sort-nas'
                   >
                      <FilterList />
                   </IconButton>
@@ -389,6 +448,7 @@ const Nas = props => {
                      aria-controls='long-menu'
                      aria-haspopup='true'
                      onClick={cleanFilters}
+                     className='clear-nas'
                   >
                      <Close />
                   </IconButton>
@@ -416,7 +476,9 @@ const Nas = props => {
                               >
                                  {nas.average && (
                                     <ListItemIcon>
-                                       <Avatar className={classes.average}>
+                                       <Avatar
+                                          className={`${classes.average} average-nas`}
+                                       >
                                           {nas.average.toFixed(1)}
                                        </Avatar>
                                     </ListItemIcon>
@@ -428,6 +490,7 @@ const Nas = props => {
                                        secondary={`${
                                           nas.patient.name
                                        } - ${formatPTDateTime(nas.nas_date)}`}
+                                       className='info-nas'
                                     />
                                  </Grid>
                                  <ListItemSecondaryAction>
@@ -435,6 +498,7 @@ const Nas = props => {
                                        edge='end'
                                        aria-label='delete'
                                        onClick={() => deletePatient(nas.id)}
+                                       className='delete-nas'
                                     >
                                        <Delete />
                                     </IconButton>
