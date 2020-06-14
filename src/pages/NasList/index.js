@@ -146,13 +146,13 @@ const Nas = props => {
    const nas = useSelector(store => store.nas)
    const stateLocation = props.location.state
    const [nasId, setNasId] = useState(null)
+   const [idNas, setIdNas] = useQueryString('id')
+   const [patient_id, setPatientId] = useQueryString('patient_id')
    const [page, setPage] = useQueryString('page', 0)
    const [name, setName] = useQueryString('name')
    const [labelName, setLabelName] = useState()
    const [firstTime, setFirstTime] = useState(true)
 
-   const [idNas, setIdNas] = useQueryString('id')
-   const [patient_id, setPatientId] = useQueryString('patient_id')
    const [created_start_date, setCreatedStartDate] = useQueryString(
       'created_start_date'
    )
@@ -359,7 +359,8 @@ const Nas = props => {
                      InputProps={{
                         startAdornment: (
                            <InputAdornment position='start'>N</InputAdornment>
-                        )
+                        ),
+                        inputProps: { min: 1 }
                      }}
                      fullWidth
                      disabled={nas.loading}

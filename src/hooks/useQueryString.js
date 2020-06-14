@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react'
 import {
    getQueryStringValue,
-   setQueryStringValue
+   setQueryStringValue,
+   removeKeyQueryString
 } from '../helpers/queryString'
 
 function useQueryString(key, initialValue) {
@@ -11,9 +12,13 @@ function useQueryString(key, initialValue) {
    const onSetValue = useCallback(
       newValue => {
          setValue(newValue)
-         if (newValue) {
-            setQueryStringValue(key, newValue)
+
+         if (!newValue || newValue.length === 0) {
+            removeKeyQueryString(key)
+            return
          }
+
+         setQueryStringValue(key, newValue)
       },
       [key]
    )

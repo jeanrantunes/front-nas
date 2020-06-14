@@ -17,7 +17,6 @@ export default function nas(state = INITIAL_STATE, action) {
       case 'REQUEST_NAS':
          return { ...state, filter: action.payload.filter, loading: true }
       case 'SUCCESS_NAS':
-         console.log(action.payload.data)
          return {
             data: action.payload.data,
             metadata: action.payload.metadata,
@@ -26,7 +25,6 @@ export default function nas(state = INITIAL_STATE, action) {
             filter: action.payload.filter || null
          }
       case 'FAILURE_NAS':
-         console.log(123)
          return {
             ...state,
             loading: false,

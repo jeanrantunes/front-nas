@@ -23,3 +23,10 @@ export const getQueryStringValue = (
    const values = qs.parse(queryString)
    return values[key]
 }
+
+export const removeKeyQueryString = key => {
+   const values = qs.parse(window.location.search)
+   delete values[key]
+   const newQsValue = qs.stringify(values)
+   setQueryStringWithoutPageReload(`?${newQsValue}`)
+}
