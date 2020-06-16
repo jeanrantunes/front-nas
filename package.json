@@ -40,7 +40,7 @@
       "node": "12.16.x"
    },
    "scripts": {
-      "start": "prestart && node server",
+      "start": "yarn install && yarn build && node server",
       "start-react": "react-scripts start",
       "build": "react-scripts build",
       "test": "react-scripts test",
