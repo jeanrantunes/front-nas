@@ -49,7 +49,7 @@
       "prettier": "prettier --write '**/*.js' --ignore-path .gitignore",
       "eslint": "eslint --ignore-path .gitignore .",
       "heroku-postbuild": "yarn build",
-      "prestart": "yarn",
+      "prestart": "npm i",
       "postinstall": "yarn build"
    },
    "eslintConfig": {
