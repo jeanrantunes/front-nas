@@ -40,7 +40,7 @@
       "node": "12.16.x"
    },
    "scripts": {
-      "start": "node server",
+      "start": "prestart && node server",
       "start-react": "react-scripts start",
       "build": "react-scripts build",
       "test": "react-scripts test",
@@ -49,6 +49,7 @@
       "prettier": "prettier --write '**/*.js' --ignore-path .gitignore",
       "eslint": "eslint --ignore-path .gitignore .",
       "heroku-postbuild": "yarn build",
+      "prestart": "yarn",
       "postinstall": "yarn build"
    },
    "eslintConfig": {
