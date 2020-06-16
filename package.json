@@ -38,7 +38,7 @@
       "node": "12.16.x"
    },
    "scripts": {
-      "start": "serve -s build",
+      "start": "node server",
       "start-react": "react-scripts start",
       "build": "react-scripts build",
       "test": "react-scripts test",
@@ -46,7 +46,8 @@
       "commit": "git-cz",
       "prettier": "prettier --write '**/*.js' --ignore-path .gitignore",
       "eslint": "eslint --ignore-path .gitignore .",
-      "heroku-postbuild": "yarn build"
+      "heroku-postbuild": "yarn build",
+      "postinstall": "npm run build"
    },
    "eslintConfig": {
       "extends": "react-app"
