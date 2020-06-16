@@ -72,6 +72,10 @@ const useStyles = makeStyles(theme => ({
    },
    errorMsg: {
       marginTop: theme.spacing(7)
+   },
+   loader: {
+      margin: `${theme.spacing(4)}px auto`,
+      display: 'block'
    }
 }))
 
@@ -98,6 +102,7 @@ const SignupConfirm = () => {
    const { updateUser, login } = useAuth()
    const [user, setUser] = useState(null)
    const [loading, setLoading] = useState(false)
+   const [loadingUser, setLoadingUser] = useState(true)
    const [success, setSuccess] = useState(false)
    const [error, setError] = useState(false)
    const classes = useStyles()
@@ -112,8 +117,10 @@ const SignupConfirm = () => {
             const { data } = await api.get('v1/users/signup-confirm', {
                params: { token }
             })
+            setLoadingUser(false)
             setUser({ ...data, firstTime: true })
          } catch {
+            setLoadingUser(false)
             setUser(null)
          }
       }
@@ -128,8 +135,10 @@ const SignupConfirm = () => {
             const { data } = await api.get('v1/users/password', {
                params: { token: passwordToken }
             })
+            setLoadingUser(false)
             setUser(data)
          } catch {
+            setLoadingUser(false)
             setUser(null)
          }
       }
@@ -141,8 +150,18 @@ const SignupConfirm = () => {
    return (
       <Container component='main' maxWidth='xs'>
          <CssBaseline />
-
-         {user ? (
+         {loadingUser ? (
+            <div>
+               <Typography
+                  align='center'
+                  variant='h5'
+                  className={classes.errorMsg}
+               >
+                  Recuperando informações...
+               </Typography>
+               <CircularProgress className={classes.loader} color='secondary' />
+            </div>
+         ) : user ? (
             <div className={classes.paper}>
                <Avatar className={classes.avatar}>
                   <LockOutlinedIcon />
