@@ -241,7 +241,7 @@ const Layout = props => {
                }}
                onBeforeExit={stepIndex => {
                   dispatch(disableSteps())
-                  if (!stepIndex) {
+                  if (isNaN(stepIndex)) {
                      return
                   }
 

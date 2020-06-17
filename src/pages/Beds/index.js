@@ -114,12 +114,12 @@ const PopoverPatient = props => {
    function handleSubmitOutcome(event) {
       event.preventDefault()
       let comorbidities = [],
-         hospitalization_reason = []
+         hr = []
       if (patient.comorbidities) {
          comorbidities = patient.comorbidities.map(c => c.id)
       }
-      if (patient.hospitalization_reason) {
-         hospitalization_reason = patient.hospitalization_reason.map(h => h.id)
+      if (patient.hr) {
+         hr = patient.hr.map(h => h.id)
       }
 
       const outcome_date = new Date()
@@ -132,7 +132,7 @@ const PopoverPatient = props => {
             outcome,
             outcome_date,
             comorbidities,
-            hospitalization_reason
+            hr
          })
       )
       setShow(false)
@@ -329,7 +329,7 @@ const Beds = props => {
             order_by: 'bed',
             items_per_page: 6,
             comorbidities: true,
-            hospitalization_reason: true,
+            hr: true,
             latest_nas: true
          })
       )
@@ -669,36 +669,27 @@ const Beds = props => {
                                              )}
                                           </Typography>
                                        )}
-                                    {patient.hospitalization_reason &&
-                                       !!patient.hospitalization_reason
-                                          .length && (
-                                          <Typography
-                                             variant='body2'
-                                             color='textSecondary'
-                                             component='p'
-                                          >
-                                             {patient.hospitalization_reason
-                                                .length > 1 ? (
-                                                <b>Motivos da internação:</b>
-                                             ) : (
-                                                <b>Motivo da internação:</b>
-                                             )}{' '}
-                                             {patient.hospitalization_reason.map(
-                                                (h, index) => (
-                                                   <span key={index}>
-                                                      {h.name}
-                                                      {index !==
-                                                      patient
-                                                         .hospitalization_reason
-                                                         .length -
-                                                         1
-                                                         ? ', '
-                                                         : '.'}
-                                                   </span>
-                                                )
-                                             )}
-                                          </Typography>
-                                       )}
+                                    {patient.hr && !!patient.hr.length && (
+                                       <Typography
+                                          variant='body2'
+                                          color='textSecondary'
+                                          component='p'
+                                       >
+                                          {patient.hr.length > 1 ? (
+                                             <b>Motivos da internação:</b>
+                                          ) : (
+                                             <b>Motivo da internação:</b>
+                                          )}{' '}
+                                          {patient.hr.map((h, index) => (
+                                             <span key={index}>
+                                                {h.name}
+                                                {index !== patient.hr.length - 1
+                                                   ? ', '
+                                                   : '.'}
+                                             </span>
+                                          ))}
+                                       </Typography>
+                                    )}
                                  </CardContent>
                                  <CardActions className={classes.buttonsCard}>
                                     <DoesShowDot flag={patient.daily_nas}>

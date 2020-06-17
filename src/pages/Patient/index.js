@@ -215,10 +215,7 @@ const Patient = props => {
                      patient.hospitalization_date || new Date(),
                   hospitalization_time:
                      patient.hospitalization_date || new Date(),
-                  hospitalization_reason:
-                     (patient.hospitalization_reason &&
-                        patient.hospitalization_reason.map(h => h.id)) ||
-                     [],
+                  hr: (patient.hr && patient.hr.map(h => h.id)) || [],
                   comorbidities:
                      (patient.comorbidities &&
                         patient.comorbidities.map(c => c.id)) ||
@@ -243,7 +240,7 @@ const Patient = props => {
                         outcome,
                         birthday,
                         comorbidities,
-                        hospitalization_reason,
+                        hr,
                         name,
                         origin,
                         saps_3,
@@ -253,7 +250,7 @@ const Patient = props => {
                      const data = {
                         birthday,
                         comorbidities,
-                        hospitalization_reason,
+                        hr,
                         name,
                         origin,
                         saps_3,
@@ -464,11 +461,11 @@ const Patient = props => {
                                     placeholder='Motivo'
                                     endpoint='/v1/hospitalization-reason'
                                     label='Motivos da internação'
-                                    name='hospitalization_reason'
+                                    name='hr'
                                     variant='outlined'
-                                    id='hospitalization_reason'
+                                    id='hr'
                                     multiple
-                                    value={values.hospitalization_reason}
+                                    value={values.hr}
                                  />
                               </Grid>
                               <Grid item xs={12} sm={6} md={4}>
