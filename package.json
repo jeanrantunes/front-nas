@@ -36,9 +36,6 @@
       "styled-components": "^5.1.1",
       "yup": "^0.28.3"
    },
-   "engines": {
-      "node": "12.16.x"
-   },
    "scripts": {
       "start": "yarn --ignore-engines && yarn run build && node server",
       "start-react": "react-scripts start",
