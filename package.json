@@ -40,7 +40,7 @@
       "node": "12.16.x"
    },
    "scripts": {
-      "start": "yarn --ignore-engines && yarn build && node server",
+      "start": "yarn --ignore-engines && yarn run build && node server",
       "start-react": "react-scripts start",
       "build": "react-scripts build",
       "test": "react-scripts test",
