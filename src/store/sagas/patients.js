@@ -43,7 +43,6 @@ export function* updatePatient({ payload: { data: content } }) {
 
       yield put({ type: 'SUCCESS_PATIENT', payload: { data: [...r, data] } })
    } catch (err) {
-      console.log(err)
       yield put({ type: 'FAILURE_PATIENT' })
    }
 }

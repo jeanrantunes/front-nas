@@ -178,7 +178,6 @@ const Layout = props => {
       clearFirstTime()
       dispatch(disableSteps())
    }
-   console.log()
    return (
       <div className={classes.root}>
          <CssBaseline />
