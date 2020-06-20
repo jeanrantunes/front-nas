@@ -31,7 +31,7 @@ import {
 } from '@material-ui/icons'
 import DateRange from '../../components/MaterialDateRange'
 import { debounce } from 'lodash-es'
-import { formatPTDateTime } from '../../helpers/date'
+import { formatPTDateTime, getDateInCurrentTimeZone } from '../../helpers/date'
 
 import { requestPatients, removePatient } from '../../store/actions/patients'
 import { enableSteps, enableButtonHelp } from '../../store/actions/stepByStep'
@@ -477,7 +477,9 @@ const Patients = props => {
                                        primary={patient.name}
                                        secondary={
                                           `Data da internação: ${formatPTDateTime(
-                                             patient.hospitalization_date
+                                             getDateInCurrentTimeZone(
+                                                patient.hospitalization_date
+                                             )
                                           )}`
                                           // patient.outcomeDate
                                           //    && `Desfecho: ${

@@ -19,10 +19,10 @@ export default function nas(state = INITIAL_STATE, action) {
       case 'SUCCESS_NAS':
          return {
             data: action.payload.data,
-            metadata: action.payload.metadata,
+            metadata: action.payload.metadata || state.metadata,
             loading: false,
             error: false,
-            filter: action.payload.filter || null
+            filter: action.payload.filter || state.filter
          }
       case 'FAILURE_NAS':
          return {

@@ -39,7 +39,7 @@ import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
 import { setQueryStringWithoutPageReload } from '../../helpers/queryString'
 import useQueryString from '../../hooks/useQueryString'
-import { formatPTDateTime } from '../../helpers/date'
+import { formatPTDateTime, getDateInCurrentTimeZone } from '../../helpers/date'
 
 const options = [
    {
@@ -490,7 +490,9 @@ const Nas = props => {
                                        primary={`N${nas.id}`}
                                        secondary={`${
                                           nas.patient.name
-                                       } - ${formatPTDateTime(nas.nas_date)}`}
+                                       } - ${formatPTDateTime(
+                                          getDateInCurrentTimeZone(nas.nas_date)
+                                       )}`}
                                        className='info-nas'
                                     />
                                  </Grid>
@@ -520,6 +522,7 @@ const Nas = props => {
                </List>
             )}
          </Paper>
+
          {nas.metadata && nas.metadata.total > items_per_page && (
             <div className={classes.pagination}>
                <Pagination

@@ -978,16 +978,16 @@ const Nas = props => {
                               nas.laboratory_investigations
                            )
                               ? false
-                              : nas.laboratory_investigations,
+                              : !!nas.laboratory_investigations,
                            medication_except_vasoactive_drugs: isNaN(
                               nas.medication_except_vasoactive_drugs
                            )
                               ? true
-                              : nas.medication_except_vasoactive_drugs,
+                              : !!nas.medication_except_vasoactive_drugs,
                            hygiene_procedures: nas.hygiene_procedures || '4a',
                            caring_for_drains: isNaN(nas.caring_for_drains)
                               ? true
-                              : nas.caring_for_drains,
+                              : !!nas.caring_for_drains,
                            mobilization_and_positioning:
                               nas.mobilization_and_positioning || '6b',
                            support_and_care: nas.support_and_care || '7a',
@@ -995,16 +995,16 @@ const Nas = props => {
                               nas.administrative_and_managerial_tasks || '8b',
                            ventilatory_support: isNaN(nas.ventilatory_support)
                               ? false
-                              : nas.ventilatory_support,
+                              : !!nas.ventilatory_support,
                            lung_function: isNaN(nas.lung_function)
                               ? true
-                              : nas.lung_function,
+                              : !!nas.lung_function,
                            artificial_airways: isNaN(nas.artificial_airways)
                               ? true
-                              : nas.artificial_airways,
+                              : !!nas.artificial_airways,
                            vasoactive_drugs: isNaN(nas.vasoactive_drugs)
                               ? false
-                              : nas.vasoactive_drugs,
+                              : !!nas.vasoactive_drugs,
                            intravenous_replacement: isNaN(
                               nas.intravenous_replacement
                            )
@@ -1014,46 +1014,46 @@ const Nas = props => {
                               nas.monitoring_of_the_left_atrium
                            )
                               ? true
-                              : nas.monitoring_of_the_left_atrium,
+                              : !!nas.monitoring_of_the_left_atrium,
                            cardiorespiratory_resumption: isNaN(
                               nas.cardiorespiratory_resumption
                            )
                               ? false
-                              : nas.cardiorespiratory_resumption,
+                              : !!nas.cardiorespiratory_resumption,
                            hemofiltration_techniques: isNaN(
                               nas.hemofiltration_techniques
                            )
                               ? false
-                              : nas.hemofiltration_techniques,
+                              : !!nas.hemofiltration_techniques,
                            urine_output: isNaN(nas.urine_output)
                               ? false
-                              : nas.urine_output,
+                              : !!nas.urine_output,
                            intracranial_pressure: isNaN(
                               nas.intracranial_pressure
                            )
                               ? false
-                              : nas.intracranial_pressure,
+                              : !!nas.intracranial_pressure,
                            acidosis_treatment: isNaN(nas.acidosis_treatment)
                               ? false
-                              : nas.acidosis_treatment,
+                              : !!nas.acidosis_treatment,
                            intravenous_hyperalimentation: isNaN(
                               nas.intravenous_hyperalimentation
                            )
                               ? false
-                              : nas.intravenous_hyperalimentation,
+                              : !!nas.intravenous_hyperalimentation,
                            enteral_feeding: isNaN(nas.enteral_feeding)
                               ? true
-                              : nas.enteral_feeding,
+                              : !!nas.enteral_feeding,
                            specific_interventions_in_the_unit: isNaN(
                               nas.specific_interventions_in_the_unit
                            )
                               ? false
-                              : nas.specific_interventions_in_the_unit,
+                              : !!nas.specific_interventions_in_the_unit,
                            specific_interventions_outside_the_unit: isNaN(
                               nas.specific_interventions_outside_the_unit
                            )
                               ? false
-                              : nas.specific_interventions_outside_the_unit,
+                              : !!nas.specific_interventions_outside_the_unit,
                            nas_date: getQueryStringValue('nas_date')
                               ? new Date(getQueryStringValue('nas_date'))
                               : new Date()
@@ -1086,7 +1086,7 @@ const Nas = props => {
                            } catch (err) {
                               setLoading(false)
                               setSuccess(false)
-                              setError(false)
+                              setError(true)
                               setTimeout(() => {
                                  setError(false)
                               }, timeSnack)

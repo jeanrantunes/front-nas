@@ -107,9 +107,17 @@ const MenuPatient = props => {
 }
 
 const PopoverPatient = props => {
-   const { patient, close, anchor, classes, dispatch } = props
+   const {
+      patient,
+      close,
+      anchor,
+      classes,
+      dispatch,
+      show,
+      setShow,
+      setAnchorPopover
+   } = props
    const [outcome, setOutcome] = useState(null)
-   const [show, setShow] = useState(true)
 
    function handleSubmitOutcome(event) {
       event.preventDefault()
@@ -126,6 +134,7 @@ const PopoverPatient = props => {
       delete patient.nas
       delete patient.average
       delete patient.latest_nas
+
       dispatch(
          updatePatient({
             ...patient,
@@ -136,6 +145,7 @@ const PopoverPatient = props => {
          })
       )
       setShow(false)
+      setAnchorPopover(null)
    }
 
    return (
@@ -289,6 +299,7 @@ const Beds = props => {
 
    const [warningDialog, setWarningDialog] = useState(false)
    const [deleteDialog, setDeleteDialog] = useState(false)
+   const [show, setShow] = useState(false)
 
    function handleClick(event, patient) {
       setPatient(null)
@@ -311,6 +322,7 @@ const Beds = props => {
    function handleClickOucome(event, patient) {
       setPatient(patient)
       setAnchorPopover(event.currentTarget)
+      setShow(true)
    }
 
    function hasNas() {
@@ -422,6 +434,9 @@ const Beds = props => {
                close={handleClose}
                classes={classes}
                dispatch={dispatch}
+               show={show}
+               setShow={setShow}
+               setAnchorPopover={setAnchorPopover}
             />
          )}
 

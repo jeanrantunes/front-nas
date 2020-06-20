@@ -53,3 +53,9 @@ export const isItBirthday = date => {
       today.getMonth() === birthday.getMonth()
    )
 }
+
+export const getDateInCurrentTimeZone = date => {
+   const dt = new Date(date)
+   dt.setMinutes(dt.getMinutes() - new Date().getTimezoneOffset())
+   return dt
+}

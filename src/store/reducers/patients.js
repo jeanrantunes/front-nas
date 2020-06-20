@@ -1,4 +1,5 @@
 import { rankingPatientsNas } from '../../utils/nas-func'
+import { getDateInCurrentTimeZone } from '../../helpers/date'
 
 const INITIAL_STATE = {
    data: [],
@@ -27,10 +28,11 @@ export default function patients(state = INITIAL_STATE, action) {
             if (!p.latest_nas) {
                return p
             }
-            if (
-               new Date(p.latest_nas.nas_date).toLocaleDateString() ===
-               new Date().toLocaleDateString()
-            ) {
+
+            const n = new Date()
+            const dt = getDateInCurrentTimeZone(p.latest_nas.nas_date)
+
+            if (n.toLocaleDateString() === dt.toLocaleDateString()) {
                p.daily_nas = true
                return p
             }
@@ -38,10 +40,10 @@ export default function patients(state = INITIAL_STATE, action) {
          })
          return {
             data: rankingPatientsNas(formatNas),
-            metadata: action.payload.metadata,
+            metadata: action.payload.metadata || state.metadata,
             loading: false,
             error: false,
-            filter: action.payload.filter || null
+            filter: action.payload.filter || state.filter
          }
       case 'FAILURE_PATIENT':
          return {

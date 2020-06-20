@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { getDateInCurrentTimeZone } from '../../helpers/date'
 
 import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
@@ -211,10 +212,12 @@ const Patient = props => {
                initialValues={{
                   name: patient.name || '',
                   birthday: patient.birthday || new Date('1970'),
-                  hospitalization_date:
-                     patient.hospitalization_date || new Date(),
-                  hospitalization_time:
-                     patient.hospitalization_date || new Date(),
+                  hospitalization_date: patient.hospitalization_date
+                     ? getDateInCurrentTimeZone(patient.hospitalization_date)
+                     : new Date(),
+                  hospitalization_time: patient.hospitalization_date
+                     ? getDateInCurrentTimeZone(patient.hospitalization_date)
+                     : new Date(),
                   hr: (patient.hr && patient.hr.map(h => h.id)) || [],
                   comorbidities:
                      (patient.comorbidities &&
@@ -223,8 +226,12 @@ const Patient = props => {
                   saps_3: patient.saps_3 || 0,
                   outcome: patient.outcome,
                   origin: patient.origin || 'ps',
-                  outcome_time: patient.outcome_date || new Date(),
-                  outcome_date: patient.outcome_date || new Date(),
+                  outcome_time: patient.outcome_date
+                     ? getDateInCurrentTimeZone(patient.outcome_date)
+                     : new Date(),
+                  outcome_date: patient.outcome_date
+                     ? getDateInCurrentTimeZone(patient.outcome_date)
+                     : new Date(),
                   bed: patient.bed || 'A'
                }}
                validationSchema={PatientSchema}
