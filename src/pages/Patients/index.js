@@ -326,7 +326,7 @@ const Patients = props => {
                            <em>Todos</em>
                         </MenuItem>
                         <MenuItem value={'pending'}>Internado</MenuItem>
-                        <MenuItem value={'dischage'}>Alta</MenuItem>
+                        <MenuItem value={'discharge'}>Alta</MenuItem>
                         <MenuItem value={'death'}>Óbito</MenuItem>
                      </Select>
                   </FormControl>

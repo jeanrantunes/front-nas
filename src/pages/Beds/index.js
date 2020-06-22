@@ -132,6 +132,7 @@ const PopoverPatient = props => {
 
       const outcome_date = new Date()
       delete patient.nas
+      delete patient.color
       delete patient.average
       delete patient.latest_nas
 
