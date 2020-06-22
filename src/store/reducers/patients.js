@@ -30,7 +30,7 @@ export default function patients(state = INITIAL_STATE, action) {
             }
 
             const n = new Date()
-            const dt = getDateInCurrentTimeZone(p.latest_nas.nas_date)
+            const dt = new Date(p.latest_nas.nas_date)
 
             if (n.toLocaleDateString() === dt.toLocaleDateString()) {
                p.daily_nas = true
