@@ -27,6 +27,13 @@ export const age = birthday => {
    return Math.abs(age.getUTCFullYear() - 1970)
 }
 
+export const howManyDays = date => {
+   const diff = Date.now() - new Date(date).getTime()
+   const time = new Date(diff)
+
+   return Math.floor(time / (1000 * 3600 * 24))
+}
+
 export const formatPTDate = date => {
    if (!date) {
       return new Date().toLocaleDateString('pt-br', options)

@@ -38,7 +38,7 @@ import {
 
 import { enableSteps, enableButtonHelp } from '../../store/actions/stepByStep'
 
-import { age, isItBirthday } from '../../helpers/date'
+import { age, isItBirthday, howManyDays } from '../../helpers/date'
 import Layout from '../../Layouts/dashboard'
 import DeleteDialog from '../../containers/DialogDeletePatient'
 
@@ -287,6 +287,21 @@ const DoesShowDot = ({ flag, children }) => {
    return children
 }
 
+const HowManyDaysYouAreInterned = date => {
+   if (!date) {
+      return
+   }
+
+   const days = howManyDays(date)
+   if (!days) {
+      return 'Internado hoje'
+   } else if (days === 1) {
+      return 'Internado há 1 dia'
+   }
+
+   return `Internado há ${days} dias`
+}
+
 const Beds = props => {
    const patients = useSelector(store => store.patients)
    const classes = useStyles()
@@ -457,62 +472,6 @@ const Beds = props => {
                </React.Fragment>
             ) : !patients.loading && !!patients.data.length ? (
                <React.Fragment>
-                  {/* <StepByStep
-                     steps={[
-                        
-                        {
-                           element: '.average-nas',
-                           intro: 'Média dos últimos 6 NAS'
-                        },
-                        {
-                           element: '.gavidity-1',
-                           intro: 'Indica o paciente mais grave'
-                        },
-
-                        {
-                           element: '.gavidity-2',
-                           intro: 'Indica o segundo paciente mais grave'
-                        },
-                        {
-                           element: '.gavidity-3',
-                           intro: 'Indica o terceiro paciente mais grave'
-                        },
-                        {
-                           element: '.register-nas',
-                           intro: 'Indica que não foi cadastrado o NAS de hoje'
-                        },
-                        {
-                           element: '.add-patient',
-                           intro: 'Adicionar um paciente'
-                        },
-                        {
-                           element: '.card-patient',
-                           intro: 'Representa um paciente internado'
-                        },
-                        {
-                           element: '.bed',
-                           intro: 'Leito do paciente'
-                        },
-                        {
-                           element: '.options-patient',
-                           intro:
-                              'Contém configurações do paciente: Editar dados, Histórico NAS e Excluir'
-                        },
-                        {
-                           element: '.content-patient',
-                           intro: 'Informações sobre o paciente'
-                        },
-                        {
-                           element: '.nas-button',
-                           intro: 'Cadastrar o NAS do dia'
-                        },
-                        {
-                           element: '.outcome-button',
-                           intro:
-                              'Dar um desfecho para o paciente: alta ou óbito'
-                        }
-                     ]}
-                  /> */}
                   <Grid item xs={12} sm={6}>
                      {hasNas(patients.data) && (
                         <Typography variant='h5' gutterBottom>
@@ -605,10 +564,12 @@ const Beds = props => {
                                        </div>
                                     }
                                     title={patient.name}
-                                    subheader={
+                                    subheader={`${
                                        patient.birthday &&
-                                       `${age(patient.birthday)} anos`
-                                    }
+                                       age(patient.birthday) + ' anos'
+                                    } - ${HowManyDaysYouAreInterned(
+                                       patient.hospitalization_date
+                                    )}`}
                                  />
                                  <CardContent
                                     className={`${classes.cardContent} content-patient`}
