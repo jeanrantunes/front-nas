@@ -24,6 +24,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles'
 import {
    Delete,
    FilterList,
+   SaveAlt,
    SentimentDissatisfied,
    Close
 } from '@material-ui/icons'
@@ -40,6 +41,7 @@ import DeleteDialog from '../../containers/DialogDeletePatient'
 import { setQueryStringWithoutPageReload } from '../../helpers/queryString'
 import useQueryString from '../../hooks/useQueryString'
 import { formatPTDateTime } from '../../helpers/date'
+import { json2csv } from '../../helpers/csv'
 
 const options = [
    {
@@ -187,6 +189,26 @@ const Nas = props => {
       idInputRef.current.value = ''
       nameInputRef.current.value = ''
       dateInputRef.current.value = ''
+   }
+
+   async function getNasForCSV() {
+      try {
+         const { data } = await api.get(`v1/nas`, {
+            params: {
+               items_per_page: 'all',
+               id: idNas || null,
+               name: name || null,
+               patient_id: patient_id || null,
+               created_start_date,
+               created_end_date,
+               order_by: options.find(o => o.id === sortedBy).field,
+               order_type: options.find(o => o.id === sortedBy).order
+            }
+         })
+         json2csv(data.data, 'nas')
+      } catch (error) {
+         // console.log(error)
+      }
    }
 
    useEffect(() => {
@@ -347,7 +369,7 @@ const Nas = props => {
       >
          <Paper elevation={1} className={classes.filter}>
             <Grid container component='main' spacing={2} className='filter-nas'>
-               <Grid item xs={12} sm={6} lg={3}>
+               <Grid item xs={12} sm={6} lg={2}>
                   <TextField
                      id='id-nas'
                      label='Código nas'
@@ -410,13 +432,21 @@ const Nas = props => {
                   item
                   xs={12}
                   sm={6}
-                  lg={1}
+                  lg={2}
                   container
                   direction='row'
                   justify={isMobile ? 'flex-end' : 'center'}
                   alignItems='center'
                   className={classes.filterButtons}
                >
+                  <IconButton
+                     aria-label='download csv file'
+                     aria-controls='long-menu'
+                     aria-haspopup='true'
+                     onClick={getNasForCSV}
+                  >
+                     <SaveAlt />
+                  </IconButton>
                   <IconButton
                      aria-label='more'
                      aria-controls='long-menu'

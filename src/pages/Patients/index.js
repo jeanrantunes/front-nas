@@ -26,12 +26,15 @@ import { makeStyles, useTheme } from '@material-ui/core/styles'
 import {
    Delete,
    FilterList,
+   SaveAlt,
    Close,
    SentimentDissatisfied
 } from '@material-ui/icons'
 import DateRange from '../../components/MaterialDateRange'
 import { debounce } from 'lodash-es'
 import { formatPTDateTime } from '../../helpers/date'
+import { json2csv } from '../../helpers/csv'
+import api from '../../services/api'
 
 import { requestPatients, removePatient } from '../../store/actions/patients'
 import { enableSteps, enableButtonHelp } from '../../store/actions/stepByStep'
@@ -201,6 +204,28 @@ const Patients = props => {
       outcomeInputRef.current.value = ''
    }
 
+   async function getPatientsForCSV() {
+      try {
+         const { data } = await api.get(`v1/patients`, {
+            params: {
+               items_per_page: 'all',
+               name: name.length ? name : null,
+               outcome: outcome.length ? outcome : null,
+               bed: bed.length ? bed : null,
+               hospitalization_start_date,
+               hospitalization_end_date,
+               outcome_start_date,
+               outcome_end_date,
+               order_by: options.find(o => o.id === sortedBy).field,
+               order_type: options.find(o => o.id === sortedBy).order
+            }
+         })
+         json2csv(data.data, 'pacientes')
+      } catch (error) {
+         // console.log(error)
+      }
+   }
+
    useEffect(() => {
       dispatch(
          requestPatients({
@@ -359,7 +384,7 @@ const Patients = props => {
                      </Select>
                   </FormControl>
                </Grid>
-               <Grid item xs={12} sm={6} lg={6}>
+               <Grid item xs={12} sm={6} lg={5}>
                   <DateRange
                      startDate={hospitalization_start_date}
                      endDate={hospitalization_end_date}
@@ -389,13 +414,21 @@ const Patients = props => {
                   item
                   xs={12}
                   sm={6}
-                  lg={1}
+                  lg={2}
                   container
                   direction='row'
                   justify={isMobile ? 'flex-end' : 'center'}
                   alignItems='center'
                   className={classes.filterButtons}
                >
+                  <IconButton
+                     aria-label='download csv file'
+                     aria-controls='long-menu'
+                     aria-haspopup='true'
+                     onClick={getPatientsForCSV}
+                  >
+                     <SaveAlt />
+                  </IconButton>
                   <IconButton
                      aria-label='more'
                      aria-controls='long-menu'
@@ -405,6 +438,7 @@ const Patients = props => {
                   >
                      <FilterList />
                   </IconButton>
+
                   <Menu
                      id='long-menu'
                      anchorEl={anchorEl}
@@ -475,23 +509,11 @@ const Patients = props => {
                                        className='info-patient'
                                        id={labelId}
                                        primary={patient.name}
-                                       secondary={
-                                          `Data da internação: ${formatPTDateTime(
-                                             // getDateInCurrentTimeZone(
-                                             patient.hospitalization_date
-                                             // )
-                                          )}`
-                                          // patient.outcomeDate
-                                          //    && `Desfecho: ${
-                                          //         patient.outcome
-                                          //      } - ${new Date(
-                                          //         patient.outcomeDate
-                                          //      ).toUTCString()}`
-                                          //    : patient.hospitalizationDate &&
-                                          //      `Entrada: ${new Date(
-                                          //         patient.hospitalizationDate
-                                          //      ).toUTCString()}`
-                                       }
+                                       secondary={`Data da internação: ${formatPTDateTime(
+                                          // getDateInCurrentTimeZone(
+                                          patient.hospitalization_date
+                                          // )
+                                       )}`}
                                     />
                                  </Grid>
                                  <ListItemSecondaryAction>
