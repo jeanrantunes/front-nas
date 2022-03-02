@@ -1,5 +1,4 @@
 import { rankingPatientsNas } from '../../utils/nas-func'
-import { getDateInCurrentTimeZone } from '../../helpers/date'
 
 const INITIAL_STATE = {
    data: [],
