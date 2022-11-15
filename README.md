@@ -1,4 +1,4 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is project to score nursing activities in a ICU (Intensive care unit).
 
 ## Available Scripts
 
